@@ -190,7 +190,3 @@ def update_monitor(date_time, stations, variable,n):
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
-    
-
-if __name__ == '__main__':
-    app.run(debug=True)
