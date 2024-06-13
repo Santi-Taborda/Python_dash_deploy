@@ -5,3 +5,7 @@ create_engine
 pymysql
 datetime
 environ
+plotly.express
+plotly.graph_objs
+dash_bootstrap_components
+make_subplots
