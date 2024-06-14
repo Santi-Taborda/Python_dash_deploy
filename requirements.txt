@@ -1,5 +1,6 @@
 dash
 pandas
+gunicorn
 create_engine
 pymysql
 datetime
