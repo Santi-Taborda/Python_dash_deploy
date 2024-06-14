@@ -8,12 +8,6 @@ import pymysql
 from plotly.subplots import make_subplots
 from os import environ as env
 
-env['DB_USER']='utpmon'
-env['DB_PASSWORD']='UtpM0n1t0r'
-env['DB_HOST']='194.163.137.37'
-env['DB_PORT']='3306'
-env['DB_NAME']='upt_monestaciones'
-
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
