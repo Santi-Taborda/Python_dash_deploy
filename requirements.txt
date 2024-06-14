@@ -4,7 +4,6 @@ gunicorn
 sqlalchemy
 pymysql
 datetime
+plotly
 plotly.express
-plotly.graph_objs
 dash_bootstrap_components
-plotly.subplots
