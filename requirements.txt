@@ -1,6 +1,5 @@
-dash==2.6.0
+dash
 pandas
-gunicorn
 create_engine
 pymysql
 datetime
