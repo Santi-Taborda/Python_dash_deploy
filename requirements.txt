@@ -1,10 +1,10 @@
 dash
 pandas
 gunicorn
-create_engine
+sqlalchemy
 pymysql
 datetime
 plotly.express
 plotly.graph_objs
 dash_bootstrap_components
-make_subplots
+plotly.subplots
