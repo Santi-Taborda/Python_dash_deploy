@@ -99,7 +99,7 @@ layout= dbc.Container(children=[
                     id='interval-component',
                     interval=60*1000, # in milliseconds
                     n_intervals=0)     
-        ], width=10)
+        ], width=12)
     ]),
     html.Hr(),
     ], fluid=True)
