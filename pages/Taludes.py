@@ -6,13 +6,6 @@ import pymysql
 import dash_leaflet as dl
 from os import environ as env
 
-env['DB_USER_2']='usrConsulta'
-env['DB_PASSWORD_2']='C0n5u1t4S4T2024'
-env['DB_HOST_2']='201.131.90.70'
-env['DB_PORT_2']='3306'
-env['DB_NAME_momos_satma']='momos_satma'
-env['DB_NAME_slidetrack']='slidetrack'
-
 env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
     password=env['DB_PASSWORD_2'],
