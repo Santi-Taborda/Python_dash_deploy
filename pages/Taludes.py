@@ -78,6 +78,7 @@ def obtener_datos(datos_tabla):
 
 datos_nodos= tabla_nodo()
 datos_tabla = obtener_datos(datos_nodos)
+sound=False
 
 register_page(__name__, name="Taludes", path='/taludes')
 
@@ -115,6 +116,7 @@ def update_map(_, n):
     datos_tabla = obtener_datos(datos_nodos)
     nodos = datos_tabla.groupby(['nameNodo'])
     markers = []
+    sound=False
     for nameNodo, momos in nodos:
         for _, row in momos.iterrows():
             icon_momo=icon_green
@@ -124,8 +126,10 @@ def update_map(_, n):
             name=row["nameNodo"]
             if state==3:
                 icon_momo=icon_red
+                sound=True
             if state==2:
                 icon_momo=icon_orange
+                sound=True
             if state==1:
                 icon_momo=icon_green
             if state==0:
@@ -133,7 +137,8 @@ def update_map(_, n):
 
             marker=dl.Marker(position=[lat, lon],
                                 icon=icon_momo,
-                            children=[
+                            children=[html.Audio(src='/assets/alert-102266.mp3', autoPlay=sound, # Ruta del archivo de audio en la carpeta assets
+                            controls=False),
                             dl.Tooltip(name),
                             dl.Popup(
                                 children=[
