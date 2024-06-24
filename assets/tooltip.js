@@ -5,20 +5,20 @@ window.dccFunctions.Hora_legible = function(value) {
      var real_year= date.getUTCFullYear()
      var real_month= date.getUTCMonth()
      var days= date.getUTCDate()
-     var hours= date.getUTCHours()+4
-     var minutes= date.getUTCMinutes()+17
+     var hours= date.getUTCHours()+3
+     var minutes= date.getUTCMinutes()-13
      var days_real=days
      var hours_real=hours
      var minutes_real=minutes
 
 
-     if (minutes>=60)
-          minutes_real=minutes-60
-          hours_real= hours+1
-     
-     if (hours>=24)
-          days_real=days+1
-
+     if (minutes<0)
+          minutes_real=minutes+60
+          hours_real= hours-1
+          if (hours_real==-1)
+               hours_real=23
+               days_real=days_real-1
+               
      var hora_transformed= ""+days_real+"/"+real_month+"/"+real_year+"   "+hours_real+":"+minutes_real
      
 /*      // Formateamos la fecha y hora
