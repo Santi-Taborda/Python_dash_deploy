@@ -14,7 +14,7 @@ window.dccFunctions.Hora_legible = function(value) {
 
      if (minutes<0)
           minutes_real=minutes+60
-          hours_real= hours-1
+          hours_real= hours_real-1
           if (hours_real==-1)
                hours_real=23
                days_real=days_real-1
