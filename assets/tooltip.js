@@ -32,5 +32,5 @@ window.dccFunctions.Hora_legible = function(value) {
            second: '2-digit'
        }); */
 
-     return (hora_transformed);
+     return (formattedDate);
 }
