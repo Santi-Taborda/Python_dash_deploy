@@ -68,10 +68,9 @@ layout= dbc.Container(children=[
                         value='El Lago',
                         multi=True,
                         className='mb-3'),
-
                     dcc.Interval(
                     id='interval-component',
-                    interval=10*60*1000, # in milliseconds
+                    interval=10*60*1000, # in milliseconds  
                     n_intervals=0),
 
                     ])], 
@@ -92,6 +91,7 @@ layout= dbc.Container(children=[
     )
 
 def update_monitor(stations,n):
+    htmls=[]
     datos_tabla,min_actualized,max_actualized= obtener_datos()
     if isinstance(stations, str):
         stations = [stations]
@@ -118,20 +118,22 @@ def update_monitor(stations,n):
                     suma=suma+row["Valor"]
 
                 datos.at[indexer, 'Valor']=suma
+            suma=round(suma,2)
         
             #fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=figure, mode="markers"),
              #   row=index+1, col=1)
+            text=""+figure+":\n Lluvia acumulada: "+str(suma)+" mm"
             fig.add_trace({
                 'type': 'scatter',
                 'x': datos['IdTiempoRegistro'],
                 'y': datos['Valor'],
-                'name': figure,
+                'name': text,
                 "mode": "lines",
                 "fill": "tozeroy"
             },
             row=index+1, col=1)
             fig.update_yaxes(title_text="Lluvia acumulada (mm)", row=index+1, col=1)
 
-        fig.update_layout(autosize=True, height=len(cant_figures)*300, bargap=0.1, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
+        fig.update_layout(autosize=True, height=len(cant_figures)*300, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=50, b=50))
     return fig
     
