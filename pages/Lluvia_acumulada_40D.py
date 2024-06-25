@@ -39,7 +39,8 @@ def obtener_datos():
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
-    datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
+    datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
+    #datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
     time_data_min=datos_tabla["timestamp"].iloc[0]
     time_data_max=datos_tabla["timestamp"].iloc[-1]
@@ -72,17 +73,18 @@ layout= dbc.Container(children=[
                     html.H6("Seleccione el rango de fechas que desea visualizar:", className="card-text" ),
 
                     dbc.Card(children=[
-                    dcc.RangeSlider(id='datetime-range-slider-alc-Per-lluvia-40D',
+                    dcc.RangeSlider(
+                                    id='datetime-range-slider-alc-Per-lluvia-40D',
                                     min=min_actualized,
                                     max=max_actualized, 
                                     value=[min_actualized,max_actualized],
+                                    step=1,
                                     marks=None,
                                     allowCross=False,
-                                    tooltip={"placement": "top", "always_visible": True},
+                                    tooltip={"placement": "top", "always_visible": False, "transform": "Hora_legible"},
                                     className='mt-3')
                                     ],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
-                                    html.H6(id="timer-show-alc-Per-lluvia-40D",  style={'marginTop': 20, 'textAlign': 'center', 'fontSize': '20px', 'color': '#0d6efd'}),
-
+                                        
                     dcc.Interval(
                     id='interval-component',
                     interval=10*60*1000, # in milliseconds
@@ -111,25 +113,6 @@ def update_slider(n):
     min_actualized=datos["timestamp"].iloc[0]
     max_actualized=datos["timestamp"].iloc[-1]
     return (min_actualized, max_actualized,[min_actualized,max_actualized])
-
-@callback(
-   Output('timer-show-alc-Per-lluvia-40D', 'children'),
-   Input('datetime-range-slider-alc-Per-lluvia-40D', 'value') 
-)
-
-def update_slider_shower(range):
-    start_date= range[0]
-    # start_date = pd.to_datetime(range[0], unit='s', utc=True).strftime('%Y-%m-%d %H:%M:%S')
-    end_date= range[1]
-    #end_date = pd.to_datetime(range[1], unit='s', utc=True).strftime('%Y-%m-%d %H:%M:%S')
-
-    return html.H6([
-        html.Span("Rango seleccionado: ", style={'fontWeight': 'bold'}),
-        html.Br(),
-        html.Span(f"Inicio: {start_date}", style={'display': 'block'}),
-        html.Span(f"Fin: {end_date}", style={'display': 'block'})
-    ])
-
 
 @callback(
     Output('monitor-alc-Per-lluvia-40D', 'figure'),
@@ -171,20 +154,23 @@ def update_monitor(date_time, stations,n):
                     suma=suma+row["Valor"]
 
                 datos.at[indexer, 'Valor']=suma
-        
+            suma=round(suma,2)
+
             #fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=figure, mode="markers"),
              #   row=index+1, col=1)
+            text=""+figure+":\n Lluvia acumulada: "+str(suma)+" mm"
             fig.add_trace({
                 'type': 'scatter',
                 'x': datos['IdTiempoRegistro'],
                 'y': datos['Valor'],
-                'name': figure,
+                'name': text,
                 "mode": "lines",
                 "fill": "tozeroy"
             },
             row=index+1, col=1)
             fig.update_yaxes(title_text="Lluvia acumulada (mm)", row=index+1, col=1)
+            texto_lluvia="Lluvia acumulada= ",str(suma)," mm"
+            fig.update_xaxes(title_text=texto_lluvia, row=index+1, col=1 )
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, bargap=0.1, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
-    
