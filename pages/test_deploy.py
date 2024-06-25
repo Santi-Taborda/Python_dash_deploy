@@ -61,7 +61,6 @@ def obtener_fecha():
 
 min_actualized,max_actualized =obtener_fecha()
 datos_tabla = obtener_datos()
-tooltip_new={"placement": "top", "always_visible": False, "transform": "Hora_legible"}
 
 
 register_page(__name__, name="Monitor", path='/aya/monitor' )
@@ -94,8 +93,9 @@ layout= dbc.Container(children=[
                                     max=max_actualized, 
                                     value=[min_actualized,max_actualized],
                                     marks=None,
+                                    step=1,
                                     allowCross=False,
-                                    tooltip=tooltip_new,
+                                    tooltip={"placement": "top", "always_visible": False, "transform": "Hora_legible"},
                                     className='mt-3')
                                     ],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
 
@@ -126,7 +126,6 @@ layout= dbc.Container(children=[
    [Output('datetime-range-slider', 'min'),
     Output('datetime-range-slider', 'max'),
     Output('datetime-range-slider', 'value'),
-    Output('datetime-range-slider', 'tooltip'),
     Output('actualizador-slider', 'children')],
    Input('interval-component', 'n_intervals') 
 )
@@ -136,9 +135,8 @@ def update_slider(n):
     time_max=pd.to_datetime(max_actualized, unit='s')
     time= datetime.now()
     dif=time-time_max
-    tooltip_new={"placement": "top", "always_visible": False, "transform": "Hora_legible"}
 
-    return (min_actualized, max_actualized,[min_actualized,max_actualized],tooltip_new,html.H6(f"{int(dif.total_seconds() // 60)} minutos desde la última actualización", 
+    return (min_actualized, max_actualized,[min_actualized,max_actualized],html.H6(f"{int(dif.total_seconds() // 60)} minutos desde la última actualización", 
                                                                                    style={'font-size':'80%'}))
 
 
