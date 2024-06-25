@@ -169,8 +169,6 @@ def update_monitor(date_time, stations,n):
             },
             row=index+1, col=1)
             fig.update_yaxes(title_text="Lluvia acumulada (mm)", row=index+1, col=1)
-            texto_lluvia="Lluvia acumulada= ",str(suma)," mm"
-            fig.update_xaxes(title_text=texto_lluvia, row=index+1, col=1 )
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, bargap=0.1, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
