@@ -78,9 +78,10 @@ layout= dbc.Container(children=[
                                     value=[min_actualized,max_actualized],
                                     marks=None,
                                     allowCross=False,
-                                    tooltip={"placement": "top", "always_visible": False, "transform": "Hora_legible"},
+                                    tooltip={"placement": "top", "always_visible": True},
                                     className='mt-3')
                                     ],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
+                                    html.H6(id="timer-show-alc-Per-lluvia-40D",  style={'marginTop': 20, 'textAlign': 'center', 'fontSize': '20px', 'color': '#0d6efd'}),
 
                     dcc.Interval(
                     id='interval-component',
@@ -101,13 +102,34 @@ layout= dbc.Container(children=[
 @callback(
    [Output('datetime-range-slider-alc-Per-lluvia-40D', 'min'),
     Output('datetime-range-slider-alc-Per-lluvia-40D', 'max'),
-    Output('datetime-range-slider-alc-Per-lluvia-40D', 'value')],
+    Output('datetime-range-slider-alc-Per-lluvia-40D', 'value'),],
    Input('interval-component', 'n_intervals') 
 )
 
 def update_slider(n):
     datos,min_actualized,max_actualized =obtener_datos()
+    min_actualized=datos["timestamp"].iloc[0]
+    max_actualized=datos["timestamp"].iloc[-1]
     return (min_actualized, max_actualized,[min_actualized,max_actualized])
+
+@callback(
+   Output('timer-show-alc-Per-lluvia-40D', 'children'),
+   Input('datetime-range-slider-alc-Per-lluvia-40D', 'value') 
+)
+
+def update_slider_shower(range):
+    start_date= range[0]
+    # start_date = pd.to_datetime(range[0], unit='s', utc=True).strftime('%Y-%m-%d %H:%M:%S')
+    end_date= range[1]
+    #end_date = pd.to_datetime(range[1], unit='s', utc=True).strftime('%Y-%m-%d %H:%M:%S')
+
+    return html.H6([
+        html.Span("Rango seleccionado: ", style={'fontWeight': 'bold'}),
+        html.Br(),
+        html.Span(f"Inicio: {start_date}", style={'display': 'block'}),
+        html.Span(f"Fin: {end_date}", style={'display': 'block'})
+    ])
+
 
 @callback(
     Output('monitor-alc-Per-lluvia-40D', 'figure'),
