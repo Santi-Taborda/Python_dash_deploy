@@ -17,7 +17,6 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     name=env['DB_NAME']
     )
  
-
 def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
@@ -56,12 +55,12 @@ layout= dbc.Container(children=[
         dbc.Col(children=[dbc.Card(children=[
                     dbc.CardBody(children=[
                     html.H4("Controles", className="card-title"),
-                    html.H6("Seleccione los municipios que desea visualizar:", className="card-text" ),
+                    html.H6("Seleccione el municipio que desea visualizar:", className="card-text" ),
                     dcc.Dropdown(
                         id='municipio-dropdown-escenarios-futuro',
                         options=pd.unique(datos_tabla["Municipio"]),
                         value="Mistrató",
-                        multi=True,
+                        multi=False,
                         className='mb-3'),
 
                     html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
@@ -104,26 +103,21 @@ def update_monitor(stations, variable):
             
         fig.update_layout(autosize=True, title_text="NINGUNA DE LOS MUNICIPIOS SELECCIONADAS SIMULA LA VARIABLE ESTABLECIDA")
     else: 
-        fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=cant_figures, vertical_spacing=0.1)
+        fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=cant_figures, vertical_spacing=0.5)
         for index, figure in enumerate(cant_figures):
             datos= datos_tabla_filtrados[datos_tabla_filtrados['Municipio']==figure]
+            max_y=max(datos['ValorMax'])
+            min_y=min(datos['ValorMin'])
 
-            fig.add_trace( {
-                'type': 'scatter',
-                'x': datos['idTiempo'],
-                'y': datos['ValorProm'],
-                'mode': 'none',
-                'name': figure
-            },
-            row=index+1, col=1)
-            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorMax'], name="Máximo", fill= 'tozeroy', line=dict(color="gray" )))
-            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorMin'], name="Mínimo", fill= 'tozeroy', fillcolor="rgb(255, 255, 255, 0.9)", line=dict(color="gray")))
-            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorProm'], name="Promedio", line=dict(color="lightblue")))
+
+            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorMax'], name="Máximo "+figure, fill= 'tozeroy', line=dict(color="gray" )))
+            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorMin'], name="Mínimo "+figure, fill= 'tozeroy', fillcolor="rgb(255, 255, 255, 0.9)", line=dict(color="gray")))
+            fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorProm'], name="Promedio "+figure, line=dict(color="lightblue")))
             
-            fig.update_yaxes(title_text=variable, row=index+1, col=1, showgrid=False)
+            fig.update_yaxes(title_text=variable, row=index+1, col=1, showgrid=False, autorange=True, minallowed=min_y)
             fig.update_xaxes(rangeslider_visible=True)
 
 
-        fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
+        fig.update_layout(autosize=True, height=len(cant_figures)*500, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
     
