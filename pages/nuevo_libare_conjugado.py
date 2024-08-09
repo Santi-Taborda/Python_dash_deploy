@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, callback, Output, Input, register_page
+""" from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
@@ -10,6 +10,12 @@ import pymysql
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
+
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
@@ -247,3 +253,4 @@ def update_monitor_lluvia(date_time,n):
     return fig_1,fig_2,fig_3, fig_4, fig_5
 
 
+ """
