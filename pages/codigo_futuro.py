@@ -16,7 +16,7 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT'],
     name=env['DB_NAME']
     )
-
+ 
 def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
