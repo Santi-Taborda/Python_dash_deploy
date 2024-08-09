@@ -16,7 +16,7 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT'],
     name=env['DB_NAME']
     )
- 
+
 def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
@@ -24,16 +24,17 @@ def obtener_datos():
     query1 = "SELECT * FROM cc_visor"
     query2 = "SELECT idMunicipio, Municipio FROM ccmunicipios"
     query3 = "SELECT idVariable, Variable FROM ccvariables"
-
+    query4 = "SELECT idEscenario, Escenario, idVariable FROM ccescenarios"
 
     datos_tabla = pd.read_sql(query1, engine)
     dimestacion = pd.read_sql(query2, engine)
     dimvariable = pd.read_sql(query3, engine)
+    dimescenario= pd.read_sql(query4, engine)
 
     datos_tabla["idTiempo"] = pd.to_datetime(datos_tabla["idTiempo"])
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idMunicipio")
+    datos_tabla = pd.merge(datos_tabla, dimescenario, on="idEscenario")
     datos_tabla = pd.merge(datos_tabla, dimvariable, on="idVariable")
-
     datos_tabla.sort_values(by="idTiempo", inplace=True)
 
     return (datos_tabla)
@@ -65,9 +66,15 @@ layout= dbc.Container(children=[
 
                     html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
 
-                    dcc.RadioItems(id='variable-button-escenarios-futuro',
+                    dcc.Dropdown(id='variable-button-escenarios-futuro',
                                     options=pd.unique(datos_tabla["Variable"]),
-                                    value='Precipitacion Histórica', inline=False, className='mb-3'),
+                                    value='Precipitación', multi=False, className='mb-3'),
+
+                    html.H6("Seleccione el escenario que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
+
+                    dcc.Dropdown(id='escenario-button-escenarios-futuro',
+                                    options=pd.unique(datos_tabla["Escenario"]),
+                                    value='Histórica', multi=False, className='mb-3'),
 
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
@@ -83,16 +90,18 @@ layout= dbc.Container(children=[
 @callback(
     Output('monitor-escenarios-futuro', 'figure'),
     Input('municipio-dropdown-escenarios-futuro', 'value'),
-    Input ('variable-button-escenarios-futuro', 'value')
+    Input ('variable-button-escenarios-futuro', 'value'),
+    Input ('escenario-button-escenarios-futuro', 'value'),
     )
 
-def update_monitor(stations, variable):
+def update_monitor(stations, variable, escenario):
     datos_tabla = obtener_datos()
 
     if isinstance(stations, str):
         stations = [stations]
 
     datos_tabla_filtrados= datos_tabla[datos_tabla["Municipio"].isin(stations)]
+    datos_tabla_filtrados= datos_tabla_filtrados[datos_tabla_filtrados["Escenario"] == escenario]
     datos_tabla_filtrados= datos_tabla_filtrados[datos_tabla_filtrados["Variable"] == variable]
     cant_figures=pd.unique(datos_tabla_filtrados["Municipio"])
 
@@ -114,7 +123,7 @@ def update_monitor(stations, variable):
             fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorMin'], name="Mínimo "+figure, fill= 'tozeroy', fillcolor="rgb(255, 255, 255, 0.9)", line=dict(color="gray")))
             fig.add_trace(go.Scatter(x=datos['idTiempo'], y=datos['ValorProm'], name="Promedio "+figure, line=dict(color="lightblue")))
             
-            fig.update_yaxes(title_text=variable, row=index+1, col=1, showgrid=False, autorange=True, minallowed=min_y)
+            fig.update_yaxes(title_text=variable+"  "+escenario, row=index+1, col=1, showgrid=False, autorange=True, minallowed=min_y)
             fig.update_xaxes(rangeslider_visible=True)
 
 
