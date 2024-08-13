@@ -1,4 +1,4 @@
-""" from dash import Dash, html, dcc, callback, Output, Input, register_page
+from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
@@ -26,7 +26,7 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     )
 
 def min_ecologico(valor_dato):
-    if valor_dato>=3.89 and valor_dato<=5.99:
+    if valor_dato<=5.99:
         Valor_minimo = 1.83
     elif valor_dato>= 6 and valor_dato<=8.99:
         Valor_minimo = 2.5
@@ -251,6 +251,3 @@ def update_monitor_lluvia(date_time,n):
     fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
     return fig_1,fig_2,fig_3, fig_4, fig_5
-
-
- """
