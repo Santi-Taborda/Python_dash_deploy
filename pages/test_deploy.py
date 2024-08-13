@@ -6,7 +6,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import pymysql
 from plotly.subplots import make_subplots
-from datetime import datetime
+from datetime import datetime, timedelta
 from os import environ as env
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
@@ -18,16 +18,18 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     )
  
 def obtener_datos():
+    fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
+    fecha_40_dias_atras=fecha_actual - timedelta(days=7)
+    hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
+    hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3)"
-    #query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14)"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
-
-    datos_tabla = pd.read_sql(query1, engine)
+    datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
     dimestacion = pd.read_sql(query2, engine)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
     dimvariable = pd.read_sql(query3, engine)
@@ -85,6 +87,11 @@ layout= dbc.Container(children=[
                         multi=True,
                         className='mb-3'),
                         
+                    html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
+
+                    dcc.Dropdown(id='variable-button',
+                                    options=pd.unique(datos_tabla["Variable"]),
+                                    value='Temperatura', multi=False, className='mb-3'),
                     html.H6("Seleccione el rango de fechas que desea visualizar:", className="card-text" ),
 
                     dbc.Card(children=[
@@ -101,11 +108,6 @@ layout= dbc.Container(children=[
 
                     html.H6(id='actualizador-slider'),
 
-                    html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
-
-                    dcc.RadioItems(id='variable-button',
-                                    options=pd.unique(datos_tabla["Variable"]),
-                                    value='Temperatura', inline=False, className='mb-3'),
                     dcc.Interval(
                     id='interval-component',
                     interval=3*60*1000, # in milliseconds
