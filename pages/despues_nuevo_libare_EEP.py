@@ -34,12 +34,11 @@ def obtener_datos():
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
     
-    query1 = "SELECT IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico, idVariable FROM factmonitoreo WHERE idEstacion IN (31) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query1 = "SELECT IdTiempoRegistro, Valor AS Valor_ecologico, idVariable FROM factmonitoreo WHERE idEstacion IN (31) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT idVariable, Variable FROM dimvariable"
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
     dimvariable = pd.read_sql(query2, engine)
 
-    #Redondeo a 5 minutos
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimvariable, on="idVariable")
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
