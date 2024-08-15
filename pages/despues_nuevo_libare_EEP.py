@@ -77,24 +77,21 @@ layout= dbc.Container(children=[
                                     allowCross=False,
                                     tooltip={"placement": "top", "always_visible": False, "transform": "Hora_legible"},
                                     className='mt-3')],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
-                                    html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
-                                    dcc.Dropdown(id='variable-button-Despues-nuevo-libare-EEP',
-                                                    options=pd.unique(datos["Variable"]),
-                                                    value='Nivel del cauce mediante radar', multi=False, className='mb-3')
+                    dcc.Interval(
+                    id='interval-component',
+                    interval=5*60*1000, # in milliseconds
+                    n_intervals=0),
+                    
+                    html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
+                    dcc.Dropdown(id='variable-button-Despues-nuevo-libare-EEP',
+                                    options=pd.unique(datos["Variable"]),
+                                    value='Nivel del cauce mediante radar', multi=False, className='mb-3')
 
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
             )], width=3
         ),
-        dbc.Col(
-            children=[
-                dcc.Graph(id='monitor_despues_bocatoma_nuevo_libare_conjugado_EEP'),
-
-                dcc.Interval(
-                    id='interval_component',
-                    interval=5*60*1000, # in milliseconds
-                    n_intervals=0),
-                ],
+        dbc.Col(dcc.Graph(id='monitor_despues_bocatoma_nuevo_libare_conjugado_EEP'),
             style={'overflowY': 'scroll', 'height': '100%'},
                 width=9),
             
@@ -119,7 +116,7 @@ def update_slider(n):
     Output('monitor_despues_bocatoma_nuevo_libare_conjugado_EEP', 'figure'),
     [Input('datetime_range_slider_despues_nuevo_libare_EEP', 'value'),
      Input('variable-button-Despues-nuevo-libare-EEP', 'value'),
-    Input('interval_component', 'n_intervals'),]
+    Input('interval-component', 'n_intervals'),]
     )
 
 def update_monitor_lluvia(date_time, variable, n):
