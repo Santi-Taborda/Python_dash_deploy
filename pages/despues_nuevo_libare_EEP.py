@@ -11,36 +11,26 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-env['DB_USER']='utpmon'
-env['DB_PASSWORD']='UtpM0n1t0r'
-env['DB_HOST']='194.163.137.37'
-env['DB_PORT']='3306'
-env['DB_NAME']='upt_monestaciones'
-
-env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
-    user=env['DB_USER'],
-    password=env['DB_PASSWORD'],
-    host=env['DB_HOST'],
-    port=env['DB_PORT'],
-    name=env['DB_NAME']
+env['DB_URL_4']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+    user=env['DB_USER_3'],
+    password=env['DB_PASSWORD_3'],
+    host=env['DB_HOST_3'],
+    port=env['DB_PORT_3'],
+    name=env['DB_NAME_AYV_UTP']
     )
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
-    fecha_40_dias_atras=fecha_actual - timedelta(days=2)
+    fecha_40_dias_atras=fecha_actual - timedelta(days=1)
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
 # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL'), echo=True)
+    engine = create_engine(env.get('DB_URL_4'), echo=True)
     # Consultas SQL
     
-    query1 = "SELECT IdTiempoRegistro, Valor AS Valor_ecologico, idVariable FROM factmonitoreo WHERE idEstacion IN (31) AND IdTiempoRegistro BETWEEN %s AND %s"
-    query2 = "SELECT idVariable, Variable FROM dimvariable"
+    query1 = "SELECT stationTime AS IdTiempoRegistro, level AS Nivel, riverFlow AS Caudal FROM tst_bocatoma_nuevo_libare WHERE stationTime BETWEEN %s AND %s"
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
-    dimvariable = pd.read_sql(query2, engine)
-
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
-    datos_tabla = pd.merge(datos_tabla, dimvariable, on="idVariable")
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
     time_data_min=datos_tabla["timestamp"].iloc[0]
@@ -84,7 +74,7 @@ layout= dbc.Container(children=[
                     
                     html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
                     dcc.Dropdown(id='variable-button-Despues-nuevo-libare-EEP',
-                                    options=pd.unique(datos["Variable"]),
+                                    options=['Nivel', 'Caudal'],
                                     value='Nivel del cauce mediante radar', multi=False, className='mb-3')
 
                     ])], 
@@ -94,7 +84,6 @@ layout= dbc.Container(children=[
         dbc.Col(dcc.Graph(id='monitor_despues_bocatoma_nuevo_libare_conjugado_EEP'),
             style={'overflowY': 'scroll', 'height': '100%'},
                 width=9),
-            
     ]),
     html.Hr(),
     ], fluid=True)
@@ -129,19 +118,35 @@ def update_monitor_lluvia(date_time, variable, n):
         (datos["IdTiempoRegistro"] >= start_time) &
         (datos["IdTiempoRegistro"] <= end_time)
     ]
-    datos_tabla_filtrados= datos_tabla_filtrados[datos_tabla_filtrados["Variable"] == variable]
-
+    
     fig_3=go.Figure()
-    fig_3.add_trace(go.Scatter(x=datos_tabla_filtrados['IdTiempoRegistro'],y=datos_tabla_filtrados['Valor_ecologico'], fill='tozeroy'))
-    fig_3.update_traces(marker_color='LightSteelBlue')
-    fig_3.update_layout(
-        plot_bgcolor='white',
-        paper_bgcolor='LightSteelBlue',
-        yaxis_title=variable,
-        xaxis_title=None,
-        margin=dict(l=30, r=30, t=0, b=40),
-        height=400,
-        showlegend=False
-    )
+
+    if variable=='Nivel':
+
+        fig_3.add_trace(go.Scatter(x=datos_tabla_filtrados['IdTiempoRegistro'],y=datos_tabla_filtrados['Nivel'], fill='tozeroy'))
+        fig_3.update_traces(marker_color='LightSteelBlue')
+        fig_3.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='LightSteelBlue',
+            yaxis_title=variable,
+            xaxis_title=None,
+            margin=dict(l=30, r=30, t=0, b=40),
+            height=400,
+            showlegend=False
+        )
+
+    elif variable=='Caudal':
+
+        fig_3.add_trace(go.Scatter(x=datos_tabla_filtrados['IdTiempoRegistro'],y=datos_tabla_filtrados['Caudal'], fill='tozeroy'))
+        fig_3.update_traces(marker_color='LightSteelBlue')
+        fig_3.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='LightSteelBlue',
+            yaxis_title=variable,
+            xaxis_title=None,
+            margin=dict(l=30, r=30, t=0, b=40),
+            height=400,
+            showlegend=False
+        )
 
     return fig_3
