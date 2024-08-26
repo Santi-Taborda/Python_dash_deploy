@@ -35,7 +35,7 @@ puntos, max_actualized, min_actualized = datos_iniciales()
 
 register_page(__name__, name="Consulta_antecedentes", path='/SATMA/consulta_antecedentes' )
 
-layout= dbc.Container(children=[
+layout= dbc.Container(fluid=True,children=[
     html.Div(
         children=[
     html.H1("Consulta antecedentes de lluvia", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
@@ -44,7 +44,7 @@ layout= dbc.Container(children=[
     ),
 
     dbc.Row(children=[
-        dbc.Col(children=[dbc.Card(children=[
+        dbc.Col(xs=12, sm=12, md=4, lg=3, children=[dbc.Card(children=[
                     dbc.CardBody(children=[
                     html.H4("Controles", className="card-title"),
                     html.H6("Seleccione la latitud:", className="card-text" ),
@@ -84,14 +84,14 @@ layout= dbc.Container(children=[
 
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
-            ), ], width=3
+            ), ],
         ),
-        dbc.Col(
-            dcc.Graph(id='Monitor_consulta_antecedentes'),style={'overflowY': 'scroll', 'height': '100%'},
-                width=9)
+        dbc.Col(xs=12, sm=12, md=8, lg=9, children=[
+            dcc.Graph(id='Monitor_consulta_antecedentes')],
+            style={'overflowY': 'scroll', 'height': '100%'})
     ]),
     html.Hr(),
-    ], fluid=True)
+    ])
 
 @callback(
     Output('Monitor_consulta_antecedentes', 'figure'),
@@ -141,6 +141,7 @@ def update_monitor(dias, latitud, longitud, dia_inicio):
         fig.update_layout(autosize=True, title_text="EL PUNTO INTRODUCIDO NO TIENE ESTACIONES CERCANAS")
 
     else:
+
         sumas = np.empty((5, 1))
         fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=cant_figures, vertical_spacing=0.1)
         for index, figure in enumerate(cant_figures):
@@ -162,14 +163,13 @@ def update_monitor(dias, latitud, longitud, dia_inicio):
                 'type': 'scatter',
                 'x': datos['IdTiempoRegistro'],
                 'y': datos['Valor'],
-                'name': text,
                 "mode": "lines",
                 "fill": "tozeroy"
             },
             row=index+1, col=1)
             fig.update_yaxes(title_text="Lluvia acumulada (mm)", row=index+1, col=1)
 
-        fig.update_layout(autosize=True, height=len(cant_figures)*300, bargap=0.1, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=0))
+        fig.update_layout(showlegend=False, autosize=True, height=len(cant_figures)*300, bargap=0.1, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=10, r=10, t=20, b=0))
     
     fig_4= go.Figure(data=[go.Table(
     header=dict(values=['Estación', 'Precipitación acumulada', 'Distancia'],
