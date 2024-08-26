@@ -45,10 +45,9 @@ def min_ecologico(valor_dato):
     elif valor_dato>= 19:
         Valor_minimo = 12
     else: Valor_minimo=valor_dato
-
+        
     return Valor_minimo
     
-
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
     fecha_40_dias_atras=fecha_actual - timedelta(days=1)
@@ -70,7 +69,6 @@ def obtener_datos():
     datos_tabla = pd.merge(datos_tabla, datos_tabla_3, on="IdTiempoRegistro")
     #Redondeo a 5 minutos
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
-    #datos_tabla['IdTiempoRegistro'] = datos_tabla['IdTiempoRegistro'].apply(redondeo_cincominutal)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
     time_data_min=datos_tabla["timestamp"].iloc[0]
@@ -81,7 +79,6 @@ def obtener_datos():
 datos,min_actualized,max_actualized= obtener_datos()
 
 register_page(__name__, name="Bocatoma Nuevo Libaré Conjugado", path='/aya/bocatoma_nuevo_libare' )
-
 
 layout= dbc.Container(children=[
     html.Div(
@@ -97,6 +94,10 @@ layout= dbc.Container(children=[
                     html.H4("Controles", className="card-title"),
                     html.H6("Seleccione el rango de fechas a visualizar:", className="card-text" ),
                     dbc.Card(children=[
+                        dcc.Interval(
+                        id='interval_component',
+                        interval=5*60*1000, # in milliseconds
+                        n_intervals=0),
                     dcc.RangeSlider(
                                     id='datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA',
                                     min=min_actualized,
@@ -126,10 +127,6 @@ layout= dbc.Container(children=[
                 dcc.Graph(id='monitor_parshal_bocatoma_nuevo_libare_conjugado_AyA'),
                 dcc.Graph(id='monitor_ecologico_bocatoma_nuevo_libare_conjugado_AyA'),
 
-                dcc.Interval(
-                    id='interval_component',
-                    interval=5*60*1000, # in milliseconds
-                    n_intervals=0),
                 ],
             style={'overflowY': 'scroll', 'height': '100%'},
                 width=9),
@@ -139,16 +136,15 @@ layout= dbc.Container(children=[
     ], fluid=True)
 
 @callback(
-   [Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'min'),
+    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'min'),
     Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'max'),
-    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'value'),],
-   Input('interval-component', 'n_intervals') 
+    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'value'),
+    Input('interval_component', 'n_intervals'),
 )
 
 def update_slider(n):
     datos,min_actualized,max_actualized =obtener_datos()
-    return (min_actualized, max_actualized,[min_actualized,max_actualized])
-
+    return min_actualized, max_actualized,[min_actualized,max_actualized]
 
 
 @callback(
@@ -245,5 +241,3 @@ def update_monitor_lluvia(date_time,n):
     fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
     return fig_1,fig_2,fig_3, fig_4, fig_5
-
-
