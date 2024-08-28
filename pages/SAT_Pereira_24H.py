@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import dash_leaflet as dl
 from os import environ as env
 
+
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
