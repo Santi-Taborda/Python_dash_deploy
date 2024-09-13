@@ -1,4 +1,4 @@
-"""from dash import Dash, html, dcc, callback, Output, Input, register_page
+from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
@@ -227,4 +227,3 @@ def update_monitor_lluvia(date_time,n):
     fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
     return fig_1, fig_4, fig_5
-"""
