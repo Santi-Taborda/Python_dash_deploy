@@ -72,8 +72,8 @@ def obtener_datos():
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
-    time_data_min=datos_tabla["timestamp"].iloc[0]
-    time_data_max=datos_tabla["timestamp"].iloc[-1]
+    time_data_max=min(datos_tabla["timestamp"])
+    time_data_min=max(datos_tabla["timestamp"])
 
     return (datos_tabla, time_data_min, time_data_max)
 
