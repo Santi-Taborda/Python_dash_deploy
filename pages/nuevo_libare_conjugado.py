@@ -169,17 +169,17 @@ def update_monitor_lluvia(date_time,n):
     datos_ecologico=datos["Valor_oferta"]
     datos_ecologico = datos_ecologico.apply(min_ecologico)
     dato_min_eco=[]
-    q_requerido=[]
+    Q_requerido=[]
     for i in range(len(datos["Valor_oferta"])):
-        q_requerido.append(4.18)
+        Q_requerido.append(4.18)
         dato_min_eco.append(1.83)
 
 
     fig_1=go.Figure()
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_oferta'], fill=None, name='Oferta',line=dict(color="blue")))
-    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Caudal Ecológico (EEP))', line=dict(color="gray")))
-    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="orange")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
     #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo 1.830 L/s', line=dict(color="red")))
 
