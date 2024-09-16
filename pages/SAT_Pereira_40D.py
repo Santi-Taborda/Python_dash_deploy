@@ -132,14 +132,17 @@ def update_map(_, n):
         lat=estacion["Latitud"].iloc[0]
         name=estacion["Estacion"].iloc[0]
         if suma>=400:
-            icon=icon_red
-            sound=True
+            if icon != icon_red:
+                icon=icon_red
+                sound=True
         elif suma >=258:
-            icon=icon_orange
-            sound=True
+            if icon != icon_orange:
+                icon=icon_orange
+                sound=True
         elif suma >=215:
-            icon=icon_yellow
-            sound=True
+            if icon != icon_yellow:
+                icon=icon_yellow
+                sound=True
 
         marker=dl.Marker(position=[lat, lon],
                                 icon=icon,
