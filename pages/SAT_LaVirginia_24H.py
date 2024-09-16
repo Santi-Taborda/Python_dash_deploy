@@ -68,7 +68,7 @@ layout= dbc.Container(children=[
     ),
     dbc.Row(children=[
         dbc.Col([
-            dl.Map(center=[5.0912, -75.8354], zoom=10, children=[
+            dl.Map(center=[5.0912, -75.8354], zoom=12, children=[
                 dl.TileLayer(),
                 dl.LayerGroup(id="layer_SAT_LaVirginia_24H")
             ], style={'width': '100%', 'height': '80vh'}), 
