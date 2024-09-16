@@ -41,7 +41,7 @@ def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (1,4,6,10,14,15,24,28,79,82,91,108,109,110,111,112,116,5) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query1 = "SELECT idEstacion, date(IdTiempoRegistro) as IdTiempoRegistro, round(sum(Valor),2) as Valor FROM factmonitoreo WHERE idEstacion IN (1,4,6,10,14,15,24,28,79,82,91,108,109,110,111,112,116,5) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY idEstacion, date(IdTiempoRegistro)"
     query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE idEstacion IN (1,4,6,10,14,15,24,28,79,82,91,108,109,110,111,112,116,5)"
 
 
