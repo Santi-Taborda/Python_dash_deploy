@@ -69,7 +69,7 @@ register_page(__name__, name="SAT_PEREIRA_40D", path='/SAT/PEREIRA/40D')
 layout= dbc.Container(children=[
     html.Div(
         children=[
-    html.H1("Monitor SAT PEREIRA 24 HORAS", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
+    html.H1("Monitor SAT PEREIRA 40 DÍAS", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
     html.Hr()],
     style={'background-color':'AliceBlue'},
     ),
