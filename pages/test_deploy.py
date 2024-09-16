@@ -127,20 +127,13 @@ layout= dbc.Container(children=[
 @callback(
    [Output('datetime-range-slider', 'min'),
     Output('datetime-range-slider', 'max'),
-    Output('datetime-range-slider', 'value'),
-    Output('actualizador-slider', 'children')],
+    Output('datetime-range-slider', 'value')],
    Input('interval-component', 'n_intervals') 
 )
 
 def update_slider(n):
     min_actualized,max_actualized =obtener_fecha()
-    time_max=pd.to_datetime(max_actualized, unit='s')
-    time= datetime.now()
-    dif=time-time_max
-
-    return (min_actualized, max_actualized,[min_actualized,max_actualized],html.H6(f"{int(dif.total_seconds() // 60)} minutos desde la última actualización", 
-                                                                                   style={'font-size':'80%'}))
-
+    return (min_actualized, max_actualized,[min_actualized,max_actualized])
 
 @callback(
     Output('monitor', 'figure'),
