@@ -72,15 +72,14 @@ def obtener_datos():
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
-    time_data_max=min(datos_tabla["timestamp"])
-    time_data_min=max(datos_tabla["timestamp"])
+    time_data_min=min(datos_tabla["timestamp"])
+    time_data_max=max(datos_tabla["timestamp"])
 
     return (datos_tabla, time_data_min, time_data_max)
 
 datos,min_actualized,max_actualized= obtener_datos()
 
 register_page(__name__, name="Bocatoma Nuevo Libaré Conjugado", path='/aya/bocatoma_nuevo_libare' )
-
 
 layout= dbc.Container(children=[
     html.Div(
@@ -144,7 +143,6 @@ layout= dbc.Container(children=[
 def update_slider(n):
     datos,min_actualized,max_actualized =obtener_datos()
     return min_actualized, max_actualized,[min_actualized,max_actualized]
-
 
 
 @callback(
