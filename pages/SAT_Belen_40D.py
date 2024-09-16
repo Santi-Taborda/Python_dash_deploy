@@ -35,7 +35,7 @@ icon_green = dict(
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
-    fecha_40_dias_atras=fecha_actual - timedelta(days=1)
+    fecha_40_dias_atras=fecha_actual - timedelta(days=40)
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
     # Conexión a la base de datos MySQL
