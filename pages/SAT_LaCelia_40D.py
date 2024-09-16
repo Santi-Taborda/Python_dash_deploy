@@ -1,4 +1,4 @@
-  from dash import Dash, html, dcc, callback, Output, Input, register_page
+from dash import Dash, html, dcc, callback, Output, Input, register_page
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objs as go
