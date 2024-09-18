@@ -19,7 +19,6 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     name=env['DB_NAME']
     )
 
-
 def min_ecologico(valor_dato):
     if valor_dato<=5.99:
         Valor_minimo = 1.83
@@ -48,7 +47,7 @@ def min_ecologico(valor_dato):
     else: Valor_minimo=valor_dato
 
     return Valor_minimo
-
+    
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
@@ -58,10 +57,14 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
+    #query1 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico FROM factmonitoreo WHERE idEstacion IN (31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    #query2 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor_oferta FROM factmonitoreo WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    #query3 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_parshal FROM factmonitoreo WHERE idEstacion IN (84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
     
-    query1 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico FROM factmonitoreo WHERE idEstacion IN (31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
-    query2 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor_oferta FROM factmonitoreo WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
-    query3 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_parshal FROM factmonitoreo WHERE idEstacion IN (84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    query1= " SELECT IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico FROM caudal_aguas WHERE idEstacion IN (31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query2= " SELECT IdTiempoRegistro, round(SUM(Valor), 2) AS Valor_oferta FROM caudal_aguas WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY IdTiempoRegistro"
+    query3= " SELECT IdTiempoRegistro, round(Valor, 2) AS Valor_parshal FROM caudal_aguas WHERE idEstacion IN (84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    
     datos_tabla_1 = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
     datos_tabla_2 = pd.read_sql(query2, engine,  params=(hace_40_dias_str, hora_actual_str))
     datos_tabla_3 = pd.read_sql(query3, engine,  params=(hace_40_dias_str, hora_actual_str))
@@ -135,7 +138,6 @@ layout= dbc.Container(children=[
     html.Hr(),
     ], fluid=True)
 
-
 @callback(
     Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'min'),
     Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'max'),
@@ -146,6 +148,7 @@ layout= dbc.Container(children=[
 def update_slider(n):
     datos,min_actualized,max_actualized =obtener_datos()
     return (min_actualized, max_actualized,[min_actualized,max_actualized])
+
 
 
 @callback(
