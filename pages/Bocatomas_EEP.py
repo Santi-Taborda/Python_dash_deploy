@@ -227,7 +227,7 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         for i in range(len(datos["Valor_oferta"])):
             Q_requerido.append(q_requerido_vb)
             dato_min_eco.append(dato_min_eco_vb)
-            datos_ecologico_B.append(datos["Valor_oferta"][i]-datos["Valor_parshal"][i])
+            datos_ecologico_B.append(round(datos["Valor_oferta"][i]-datos["Valor_parshal"][i],2))
     if Bocatoma=='Bocatoma Nuevo Libaré':
         for i in range(len(datos["Valor_oferta"])):
             Q_requerido.append(q_requerido_vb)
@@ -326,5 +326,3 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
     return fig_1, fig_4, fig_5
-
-
