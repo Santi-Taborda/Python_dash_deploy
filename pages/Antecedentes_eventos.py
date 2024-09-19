@@ -19,17 +19,28 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     name=env['DB_NAME']
     )
 
-# La colonia, Mundo Nuevo, Ukumarí, La curva, La católica, La Dulcera, El Lago
+env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+    user=env['DB_USER_2'],
+    password=env['DB_PASSWORD_2'],
+    host=env['DB_HOST_2'],
+    port=env['DB_PORT_2'],
+    name=env['DB_NAME_SATMA']
+    )
 
 def datos_iniciales():
     fecha_actual=datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
     fecha_40_dias_atras=fecha_actual - timedelta(days=40)
-    engine = create_engine(env.get('DB_URL'), echo=True)
-    query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12)"
-    dimestacion = pd.read_sql(query2, engine)
+    engine1 = create_engine(env.get('DB_URL'), echo=True)
+    engine2=create_engine(env.get('DB_URL_2'), echo=True)
+    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12)"
+    query2= "SELECT Estacion, Estado FROM estaciones"
+    dimestacion = pd.read_sql(query1, engine1)
+    dimestado = pd.read_sql(query2, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
+    datos_tabla = pd.merge(dimestacion, dimestado, on="Estacion")
+    datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
 
-    return dimestacion, fecha_actual, fecha_40_dias_atras
+    return datos_tabla_filtrados, fecha_actual, fecha_40_dias_atras
 
 puntos, max_actualized, min_actualized = datos_iniciales()
 
