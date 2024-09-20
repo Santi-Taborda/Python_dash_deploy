@@ -89,7 +89,6 @@ layout= dbc.Container(children=[
                 
                 dl.LayerGroup(id="layer_SAT_Departamento_40D")
             ], style={'width': '100%', 'height': '80vh'}), 
-
             dcc.Interval(
                     id='interval-component',
                     interval=5*60*1000, # in milliseconds
@@ -127,6 +126,7 @@ layout= dbc.Container(children=[
     ]),
     html.Hr(),
     ], fluid=True)
+
 
 
 @callback(
