@@ -78,10 +78,40 @@ layout= dbc.Container(children=[
                     id='interval-component',
                     interval=5*60*1000, # in milliseconds
                     n_intervals=0)     
-        ], width=12)
+        ], width=10),
+        dbc.Col(children=[
+            dbc.Card(
+        dbc.CardBody([
+          
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=FkQHNSmqWQWH&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P("<215 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+            
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=VW9mAoyk46FP&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">215 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=zQ1yf8Peqsvz&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">258 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=Zyo5wDjgJxRW&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">400 mm", className="mb-0"), width="auto")
+            ], align="left"),
+        ]),
+        className="shadow p-3 mb-5 bg-white rounded",
+    )
+        ], width=2)
     ]),
     html.Hr(),
     ], fluid=True)
+
 
 @callback(
     Output("layer_SAT_Pereira_40D", "children"),
