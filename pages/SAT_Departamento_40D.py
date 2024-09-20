@@ -78,7 +78,7 @@ register_page(__name__, name="SAT_DEPARTAMENTAL_40D", path='/SAT/DEPARTAMENTO/40
 layout= dbc.Container(children=[
     html.Div(
         children=[
-    html.H1("Monitor SAT DEPARTAMENTAL 40 DÍAS", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
+    html.H1("MONITOR SAT DEPARTAMENTAL 40 DÍAS", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
     html.Hr()],
     style={'background-color':'AliceBlue'},
     ),
@@ -86,6 +86,7 @@ layout= dbc.Container(children=[
         dbc.Col([
             dl.Map(center=[5.0381, -75.5950], zoom=10, children=[
                 dl.TileLayer(),
+                
                 dl.LayerGroup(id="layer_SAT_Departamento_40D")
             ], style={'width': '100%', 'height': '80vh'}), 
 
@@ -93,7 +94,36 @@ layout= dbc.Container(children=[
                     id='interval-component',
                     interval=5*60*1000, # in milliseconds
                     n_intervals=0)     
-        ], width=12)
+        ], width=10),
+        dbc.Col(children=[
+            dbc.Card(
+        dbc.CardBody([
+          
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=FkQHNSmqWQWH&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P("<215 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+            
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=VW9mAoyk46FP&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">215 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=zQ1yf8Peqsvz&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">258 mm", className="mb-0"), width="auto")
+            ], align="left"),
+
+            dbc.Row(children=[
+                dbc.Col(html.Img(src="https://img.icons8.com/?size=30&id=Zyo5wDjgJxRW&format=png&color=000000", className="img-fluid"),width="auto"),
+                dbc.Col(html.P(">400 mm", className="mb-0"), width="auto")
+            ], align="left"),
+        ]),
+        className="shadow p-3 mb-5 bg-white rounded",
+    )
+        ], width=2)
     ]),
     html.Hr(),
     ], fluid=True)
