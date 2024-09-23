@@ -32,15 +32,15 @@ def datos_iniciales():
     fecha_40_dias_atras=fecha_actual - timedelta(days=40)
     engine1 = create_engine(env.get('DB_URL'), echo=True)
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
-    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13)"
+    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13) AND Latitud IS NOT NULL AND Longitud IS NOT NULL"
     query2= "SELECT Estacion, Estado FROM estaciones"
     dimestacion = pd.read_sql(query1, engine1)
     dimestado = pd.read_sql(query2, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
     datos_tabla = pd.merge(dimestacion, dimestado, on="Estacion")
-    datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
+    #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
 
-    return datos_tabla_filtrados, fecha_actual, fecha_40_dias_atras
+    return datos_tabla, fecha_actual, fecha_40_dias_atras
 
 puntos, max_actualized, min_actualized = datos_iniciales()
 
@@ -124,7 +124,10 @@ def update_monitor(dias, latitud, longitud, dia_inicio):
     puntos = np.empty((len(datos_tabla), 2))
 
     for i, row in datos_tabla.iterrows():
-        puntos[i] = [row['Latitud'],row['Longitud']]
+        if row['Estado']==1:
+            puntos[i] = [row['Latitud'],row['Longitud']]
+        else:
+            puntos[i] = [0,0]
     #nuevo_punto = np.array([4.8146, -75.6981])
     nuevo_punto = np.array([latitud, longitud])
     tree = cKDTree(puntos)
