@@ -32,7 +32,7 @@ def datos_iniciales():
     fecha_40_dias_atras=fecha_actual - timedelta(days=40)
     engine1 = create_engine(env.get('DB_URL'), echo=True)
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
-    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12)"
+    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13)"
     query2= "SELECT Estacion, Estado FROM estaciones"
     dimestacion = pd.read_sql(query1, engine1)
     dimestado = pd.read_sql(query2, engine2)
