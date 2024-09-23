@@ -54,7 +54,7 @@ def obtener_datos():
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
     query1 = "SELECT idEstacion, IdTiempoRegistro, Valor FROM factmonitoreo WHERE IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
-    query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12) "
+    query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13) "
     query3= "SELECT Estacion, Estado FROM estaciones"
 
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
