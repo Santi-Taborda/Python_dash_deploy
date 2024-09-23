@@ -41,8 +41,8 @@ def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (1,4,6,10,11,12,13,14,15,24,25,28,29,30,78,78,79,82,91,95,96,97,98,114,51) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
-    query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE idEstacion IN (1,4,6,10,11,12,13,14,15,24,25,28,29,30,78,78,79,82,91,95,96,97,98,114,51)"
+    query1 = "SELECT idEstacion, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (1,4,6,10,11,12,13,14,15,24,25,28,29,30,78,78,79,82,91,95,96,97,98,114,51,122) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query2 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE idEstacion IN (1,4,6,10,11,12,13,14,15,24,25,28,29,30,78,78,79,82,91,95,96,97,98,114,51,122)"
 
 
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
