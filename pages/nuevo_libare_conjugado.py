@@ -184,7 +184,7 @@ def update_monitor_lluvia(date_time,n):
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Caudal Ecológico (EEP)', line=dict(color="gray")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
-    #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental variable', line=dict(color="rgb(173,0,0)")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo 1.830 L/s', line=dict(color="red")))
 
     fig_1.update_traces(marker_color='LightSteelBlue')
