@@ -242,6 +242,7 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental mínimo', line=dict(color="red")))
     if Bocatoma=='Bocatoma Belmonte':
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos_ecologico_B, fill=None,name='Caudal Ecológico', line=dict(color="gray")))
+        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
         #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo', line=dict(color="red")))
 
