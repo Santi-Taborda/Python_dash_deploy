@@ -10,6 +10,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta, date, time
 from os import environ as env
 from scipy.spatial import cKDTree
+import dash_leaflet as dl
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
@@ -27,6 +28,15 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     name=env['DB_NAME_SATMA']
     )
 
+icon_x=dict(
+    iconUrl="https://img.icons8.com/?size=30&id=T9nkeADgD3z6&format=png&color=000000"
+)
+
+icon_green = dict(
+    iconUrl='https://img.icons8.com/?size=30&id=FkQHNSmqWQWH&format=png&color=000000',
+)
+
+# La colonia, Mundo Nuevo, Ukumarí, La curva, La católica, La Dulcera, El Lago
 def datos_iniciales():
     fecha_actual=datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
     fecha_40_dias_atras=fecha_actual - timedelta(days=40)
@@ -38,7 +48,6 @@ def datos_iniciales():
     dimestado = pd.read_sql(query2, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
     datos_tabla = pd.merge(dimestacion, dimestado, on="Estacion")
-    #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
 
     return datos_tabla, fecha_actual, fecha_40_dias_atras
 
@@ -85,6 +94,14 @@ layout= dbc.Container(fluid=True,children=[
                         value=40,
                         type='number',
                         className='mb-3'),
+
+                    html.H6("Ver en mapa:", className="card-text" ),
+                    dcc.RadioItems(
+                        id='Mapa_consulta_antecedentes',
+                        options=["Si","No"],
+                        value="No",
+                        className='mb-3'),
+
                     html.Div(
                     children=[
                         dcc.Graph(id='tabla_lluvia_antecedentes'),
@@ -98,11 +115,68 @@ layout= dbc.Container(fluid=True,children=[
             ), ],
         ),
         dbc.Col(xs=12, sm=12, md=8, lg=9, children=[
-            dcc.Graph(id='Monitor_consulta_antecedentes')],
+            dcc.Graph(id='Monitor_consulta_antecedentes'),
+            dl.Map(center=[5.0381, -75.5950], zoom=10, children=[
+                dl.TileLayer(),
+                dl.LayerGroup(id="layer_consulta_antecedentes")
+            ], style={'width': '100%', 'height': '80vh'}),
+            ],
             style={'overflowY': 'scroll', 'height': '100%'})
     ]),
     html.Hr(),
     ])
+
+
+@callback(
+    Output('layer_consulta_antecedentes', 'children'),
+    Input('Mapa_consulta_antecedentes','value'),
+    Input('Cantidad_dias_antecedentes', 'value'),
+    Input('Latitud_consulta_antecedentes', 'value'),
+    Input('Longitud_consulta_antecedentes', 'value'),
+    Input('Fecha_consulta_antecedentes', 'date'),
+    )
+
+def update_map(mapa,dias, latitud, longitud, dia_inicio):
+    markers=[]
+    if mapa=="Si":
+        datos_tabla,max_actualized,min_actualized= datos_iniciales()
+        fecha=date.fromisoformat(dia_inicio)
+        #fecha=date.today()
+        hora_1159pm = time(23, 59, 0)
+        max_actualized=datetime.combine(fecha, hora_1159pm)
+        min_actualized=max_actualized - timedelta(days=dias)
+        puntos = np.empty((len(datos_tabla), 2))
+        for i, row in datos_tabla.iterrows():
+            if row['Estado']==1:
+                puntos[i] = [row['Latitud'],row['Longitud']]
+            else:
+                puntos[i] = [0,0]
+        nuevo_punto = np.array([latitud, longitud])
+        #nuevo_punto = np.array([4.8146, -75.6981])
+        marker=dl.Marker(position=[nuevo_punto[0], nuevo_punto[1]],
+                                icon=icon_x,
+                                children=[
+                                dl.Tooltip("Evento"),
+                                ])
+        markers.append(marker)
+        tree = cKDTree(puntos)
+        distancias, indices = tree.query(nuevo_punto, k=5)
+
+        puntos=puntos[indices,0]
+
+        datos_tabla_filtrados=datos_tabla[datos_tabla["Latitud"].isin(puntos)]
+
+        for i, row in datos_tabla_filtrados.iterrows():
+            marker=dl.Marker(position=[row["Latitud"], row["Longitud"]],
+                                icon=icon_green,
+                                children=[
+                                dl.Tooltip(row["Estacion"]),
+                                ])
+            markers.append(marker)
+
+    return markers
+
+
 
 @callback(
     Output('Monitor_consulta_antecedentes', 'figure'),
@@ -110,7 +184,7 @@ layout= dbc.Container(fluid=True,children=[
     Input('Cantidad_dias_antecedentes', 'value'),
     Input('Latitud_consulta_antecedentes', 'value'),
     Input('Longitud_consulta_antecedentes', 'value'),
-    Input('Fecha_consulta_antecedentes', 'date')
+    Input('Fecha_consulta_antecedentes', 'date'),
     )
 
 def update_monitor(dias, latitud, longitud, dia_inicio):
