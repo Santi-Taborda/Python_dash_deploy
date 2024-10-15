@@ -26,7 +26,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitor_otuneo WHERE idEstacion IN (21,22,15,23,79,16,24,26) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (21,22,15,23,79,16,24,26) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
@@ -52,7 +52,7 @@ def obtener_fecha():
     engine = create_engine(env.get('DB_URL'), echo=True)
 
     # Consultas SQL
-    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitor_otuneo_1s WHERE idEstacion IN (21,22,15,23,79,16,24,26)"
+    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (21,22,15,23,79,16,24,26)"
 
     datos_tabla = pd.read_sql(query1, engine)
 
