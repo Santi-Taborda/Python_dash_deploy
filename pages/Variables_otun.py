@@ -26,7 +26,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (21,22,15,23,79,16,24,26) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitor_otuneo WHERE idEstacion IN (21,22,15,23,79,16,24,26) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
@@ -52,7 +52,7 @@ def obtener_fecha():
     engine = create_engine(env.get('DB_URL'), echo=True)
 
     # Consultas SQL
-    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (21,22,15,23,79,16,24,26)"
+    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitor_otuneo_1s WHERE idEstacion IN (21,22,15,23,79,16,24,26)"
 
     datos_tabla = pd.read_sql(query1, engine)
 
@@ -70,7 +70,7 @@ register_page(__name__, name="Variables_Otun", path='/aya/variables_otun' )
 layout= dbc.Container(children=[
     html.Div(
         children=[
-    html.H1("Monitor de variables AyA", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
+    html.H1("monitor_otun de variables AyA", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
     html.Hr()],
     style={'background-color':'AliceBlue'},
     ),
@@ -82,13 +82,13 @@ layout= dbc.Container(children=[
                         
                     html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
 
-                    dcc.Dropdown(id='variable-button',
+                    dcc.Dropdown(id='variable_button_otun',
                                     options=pd.unique(datos_tabla["Variable"]),
                                     value='Temperatura', multi=False, className='mb-3'),
                     html.H6("Seleccione el rango de fechas que desea visualizar:", className="card-text" ),
 
                     dbc.Card(children=[
-                    dcc.RangeSlider(id='datetime-range-slider',
+                    dcc.RangeSlider(id='datetime_range_slider_otun',
                                     min=min_actualized,
                                     max=max_actualized, 
                                     value=[min_actualized,max_actualized],
@@ -99,7 +99,7 @@ layout= dbc.Container(children=[
                                     className='mt-3')
                                     ],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
 
-                    html.H6(id='actualizador-slider'),
+                    html.H6(id='actualizador_slider_otun'),
 
                     dcc.Interval(
                     id='interval-component',
@@ -111,16 +111,16 @@ layout= dbc.Container(children=[
             )], width=3
         ),
         dbc.Col(
-            dcc.Graph(id='monitor'),style={'overflowY': 'scroll', 'height': '100%'},
+            dcc.Graph(id='monitor_otun'),style={'overflowY': 'scroll', 'height': '100%'},
                 width=9)
     ]),
     html.Hr(),
     ], fluid=True)
 
 @callback(
-   [Output('datetime-range-slider', 'min'),
-    Output('datetime-range-slider', 'max'),
-    Output('datetime-range-slider', 'value')],
+   [Output('datetime_range_slider_otun', 'min'),
+    Output('datetime_range_slider_otun', 'max'),
+    Output('datetime_range_slider_otun', 'value')],
    Input('interval-component', 'n_intervals') 
 )
 
@@ -133,13 +133,13 @@ def update_slider(n):
 
 
 @callback(
-    Output('monitor', 'figure'),
-    Input('datetime-range-slider', 'value'),
-    Input ('variable-button', 'value'),
+    Output('monitor_otun', 'figure'),
+    Input('datetime_range_slider_otun', 'value'),
+    Input ('variable_button_otun', 'value'),
     Input('interval-component', 'n_intervals')
     )
 
-def update_monitor(date_time, variable,n):
+def update_monitor_otun(date_time, variable,n):
     datos_tabla = obtener_datos()
 
     datos_tabla_filtrados= datos_tabla[datos_tabla["Variable"] == variable]
@@ -156,7 +156,7 @@ def update_monitor(date_time, variable,n):
         fig.add_trace(go.Scatter(x=None, y=None),
             row=1, col=1)
             
-        fig.update_layout(autosize=True, title_text="NINGUNA DE LAS ESTACIONES SELECCIONADAS MONITOREA LA VARIABLE ESTABLECIDA")
+        fig.update_layout(autosize=True, title_text="NINGUNA DE LAS ESTACIONES SELECCIONADAS monitor_otunEA LA VARIABLE ESTABLECIDA")
     else: 
         fig= make_subplots(rows=len(cant_figures), cols=1, vertical_spacing=0.009)
         titulo=variable+ " Estaciones Cuenca Río Otún"
