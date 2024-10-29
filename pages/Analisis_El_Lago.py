@@ -3,24 +3,45 @@ import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
 import pandas as pd
-from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
+from os import environ as env
+from sqlalchemy import create_engine
+import pymysql
+
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
+
+env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+    user=env['DB_USER'],
+    password=env['DB_PASSWORD'],
+    host=env['DB_HOST'],
+    port=env['DB_PORT'],
+    name=env['DB_NAME']
+    )
+
+# Conexión a la base de datos MySQL
+engine = create_engine(env.get('DB_URL'), echo=True)
+
+query1 = "SELECT IdTiempoRegistro, ppt_24h, yellow, orange, red FROM EL_LAGO_PPT"
 
 register_page(__name__, name="Analisis_El_Lago", path='/SAT/Analisis_El_Lago' )
 
-
-
-datos_tabla= pd.read_csv('./assets/EVALUACION_ALERTA_24H.csv', sep=',')
+datos_tabla = pd.read_sql(query1, engine)
+datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
+#datos_tabla= pd.read_csv('./assets/EVALUACION_ALERTA_24H.csv', sep=',')
 datos_rojo=datos_tabla[datos_tabla["red"]==1]
 datos_naranja=datos_tabla[datos_tabla["orange"]==1]
 datos_amarillo=datos_tabla[datos_tabla["yellow"]==1]
-datos_verde=datos_tabla[(datos_tabla["orange"]==0) & (datos_tabla["red"]==0) & (datos_tabla["yellow"]==0)]
+#datos_verde=datos_tabla[(datos_tabla["orange"]==0) & (datos_tabla["red"]==0) & (datos_tabla["yellow"]==0)]
 
 cantidad_rojo=len(datos_rojo)
 cantidad_naranja=len(datos_naranja)
 cantidad_amarillo=len(datos_amarillo)
-cantidad_verde=len(datos_verde)
 cantidad_total=len(datos_tabla)
+cantidad_verde=cantidad_total-cantidad_rojo-cantidad_naranja-cantidad_amarillo
 
 porcentaje_rojo=cantidad_rojo*100/cantidad_total
 porcentaje_naranja=cantidad_naranja*100/cantidad_total
