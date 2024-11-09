@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 app= Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.CERULEAN])
 
 # Define the navigation bar
-""" navbar = dbc.NavbarSimple(
+navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("HOME", href="/")),
     ],
@@ -12,10 +12,10 @@ app= Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.CERULEAN])
     brand_href="/",
     color="dark",
     dark=True,
-) """
+) 
 
 app.layout =html.Div([
-    #navbar,
+    navbar,
     page_container
 ])
 
