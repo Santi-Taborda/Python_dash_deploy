@@ -1,3 +1,4 @@
+"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -162,3 +163,4 @@ def update_map(_, n):
             markers.append(marker)
 
     return markers
+"""
