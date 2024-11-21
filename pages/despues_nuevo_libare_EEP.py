@@ -11,13 +11,51 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-env['DB_URL_4']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
-    user=env['DB_USER_3'],
-    password=env['DB_PASSWORD_3'],
-    host=env['DB_HOST_3'],
-    port=env['DB_PORT_3'],
-    name=env['DB_NAME_AYV_UTP']
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+#env['DB_USER']='utpConsulta'
+#env['DB_PASSWORD']='UtpC0nsult@'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
+
+env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+    user=env['DB_USER'],
+    password=env['DB_PASSWORD'],
+    host=env['DB_HOST'],
+    port=env['DB_PORT'],
+    name=env['DB_NAME']
     )
+
+def min_ecologico(valor_dato):
+    if valor_dato<=5.99:
+        Valor_minimo = 1.83
+    elif valor_dato>= 6 and valor_dato<=8.99:
+        Valor_minimo = 2.5
+    elif valor_dato>= 9 and valor_dato<=10.99:
+        Valor_minimo = 3
+    elif valor_dato>= 11 and valor_dato<=11.99:
+        Valor_minimo = 4
+    elif valor_dato>= 12 and valor_dato<=12.99:
+        Valor_minimo = 5
+    elif valor_dato>= 13 and valor_dato<=13.99:
+        Valor_minimo = 6
+    elif valor_dato>= 14 and valor_dato<=14.99:
+        Valor_minimo = 7
+    elif valor_dato>= 15 and valor_dato<=15.99:
+        Valor_minimo = 8
+    elif valor_dato>= 16 and valor_dato<=16.99:
+        Valor_minimo = 9
+    elif valor_dato>= 17 and valor_dato<=17.99:
+        Valor_minimo = 10
+    elif valor_dato>= 18 and valor_dato<=18.99:
+        Valor_minimo = 11
+    elif valor_dato>= 19:
+        Valor_minimo = 12
+    else: Valor_minimo=valor_dato
+
+    return Valor_minimo
+    
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
@@ -25,28 +63,41 @@ def obtener_datos():
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
 # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL_4'), echo=True)
+    engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
+    #query1 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico FROM factmonitoreo WHERE idEstacion IN (31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    #query2 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor_oferta FROM factmonitoreo WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    #query3 = "SELECT FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(Valor, 2) AS Valor_parshal FROM factmonitoreo WHERE idEstacion IN (84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
     
-    query1 = "SELECT stationTime AS IdTiempoRegistro, level AS Nivel, riverFlow AS Caudal FROM tst_bocatoma_nuevo_libare WHERE stationTime BETWEEN %s AND %s"
-    datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
+    query1= " SELECT IdTiempoRegistro, round(Valor, 2) AS Valor_ecologico FROM caudal_aguas WHERE idEstacion IN (31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query2= " SELECT IdTiempoRegistro, round(SUM(Valor), 2) AS Valor_oferta FROM caudal_aguas WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY IdTiempoRegistro"
+    query3= " SELECT IdTiempoRegistro, round(Valor, 2) AS Valor_parshal FROM caudal_aguas WHERE idEstacion IN (84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    
+    datos_tabla_1 = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
+    datos_tabla_2 = pd.read_sql(query2, engine,  params=(hace_40_dias_str, hora_actual_str))
+    datos_tabla_3 = pd.read_sql(query3, engine,  params=(hace_40_dias_str, hora_actual_str))
+
+    #Concateno tablas
+    datos_tabla = pd.merge(datos_tabla_1, datos_tabla_2, on="IdTiempoRegistro")
+    datos_tabla = pd.merge(datos_tabla, datos_tabla_3, on="IdTiempoRegistro")
+    #Redondeo a 5 minutos
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
-    time_data_min=datos_tabla["timestamp"].iloc[0]
-    time_data_max=datos_tabla["timestamp"].iloc[-1]
+    time_data_min=min(datos_tabla["timestamp"])
+    time_data_max=max(datos_tabla["timestamp"])
 
     return (datos_tabla, time_data_min, time_data_max)
 
 datos,min_actualized,max_actualized= obtener_datos()
 
-register_page(__name__, name="Después de Nuevo Libaré", path='/EEP/despues_nuevo_libare' )
+register_page(__name__, name="Bocatoma Nuevo Libaré Conjugado", path='/aya/bocatoma_nuevo_libare' )
 
 
 layout= dbc.Container(children=[
     html.Div(
         children=[
-    html.H1("Visor Después de Nuevo Libaré", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
+    html.H1("Bocatoma Nuevo Libaré Conjugado AyA", style={'textAlign': 'left', 'color': '#0d6efd', 'margin-left':'20px', 'padding':'10px'}),
     html.Hr()],
     style={'background-color':'AliceBlue'},
     ),
@@ -57,8 +108,12 @@ layout= dbc.Container(children=[
                     html.H4("Controles", className="card-title"),
                     html.H6("Seleccione el rango de fechas a visualizar:", className="card-text" ),
                     dbc.Card(children=[
+                        dcc.Interval(
+                        id='interval_component',
+                        interval=5*60*1000, # in milliseconds
+                        n_intervals=0),
                     dcc.RangeSlider(
-                                    id='datetime_range_slider_despues_nuevo_libare_EEP',
+                                    id='datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA',
                                     min=min_actualized,
                                     max=max_actualized, 
                                     value=[min_actualized,max_actualized],
@@ -66,33 +121,36 @@ layout= dbc.Container(children=[
                                     marks=None,
                                     allowCross=False,
                                     tooltip={"placement": "top", "always_visible": False, "transform": "Hora_legible"},
-                                    className='mt-3')],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
-                    dcc.Interval(
-                    id='interval-component',
-                    interval=5*60*1000, # in milliseconds
-                    n_intervals=0),
-                    
-                    html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
-                    dcc.Dropdown(id='variable-button-Despues-nuevo-libare-EEP',
-                                    options=['Nivel', 'Caudal'],
-                                    value='Nivel del cauce mediante radar', multi=False, className='mb-3')
+                                    className='mt-3')
+                                    ],className="shadow-none p-1 mb-2 rounded", color="#D3F1FF"),
+                    html.Div(
+                    children=[
+                        dcc.Graph(id='tabla_caudal_bocatoma_nuevo_libare_conjugado_AyA'),
+                        dcc.Graph(id='tabla_cumplimiento_bocatoma_nuevo_libare_conjugado_AyA'),
+                    ],
+                    style={'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center'}
+                    ),
 
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
             )], width=3
         ),
-        dbc.Col(dcc.Graph(id='monitor_despues_bocatoma_nuevo_libare_conjugado_EEP'),
+        dbc.Col(
+            children=[
+                dcc.Graph(id='monitor_oferta_bocatoma_nuevo_libare_conjugado_AyA'),
+                ],
             style={'overflowY': 'scroll', 'height': '100%'},
                 width=9),
+            
     ]),
     html.Hr(),
     ], fluid=True)
 
 @callback(
-   [Output('datetime_range_slider_despues_nuevo_libare_EEP', 'min'),
-    Output('datetime_range_slider_despues_nuevo_libare_EEP', 'max'),
-    Output('datetime_range_slider_despues_nuevo_libare_EEP', 'value'),],
-   Input('interval-component', 'n_intervals') 
+    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'min'),
+    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'max'),
+    Output('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'value'),
+    Input('interval_component', 'n_intervals'),
 )
 
 def update_slider(n):
@@ -102,51 +160,83 @@ def update_slider(n):
 
 
 @callback(
-    Output('monitor_despues_bocatoma_nuevo_libare_conjugado_EEP', 'figure'),
-    [Input('datetime_range_slider_despues_nuevo_libare_EEP', 'value'),
-     Input('variable-button-Despues-nuevo-libare-EEP', 'value'),
-    Input('interval-component', 'n_intervals'),]
+    [Output('monitor_oferta_bocatoma_nuevo_libare_conjugado_AyA', 'figure'),
+    Output('tabla_caudal_bocatoma_nuevo_libare_conjugado_AyA', 'figure'),
+    Output('tabla_cumplimiento_bocatoma_nuevo_libare_conjugado_AyA', 'figure'),],
+    [Input('datetime_range_slider_bocatoma_nuevo_libare_conjugado_AyA', 'value'),
+    Input('interval_component', 'n_intervals'),]
     )
 
-def update_monitor_lluvia(date_time, variable, n):
+def update_monitor_lluvia(date_time,n):
 
     datos,min_actualized,max_actualized=obtener_datos()
     start_time = pd.to_datetime(date_time[0], unit='s', utc=True)
     end_time = pd.to_datetime(date_time[1], unit='s', utc=True)
 
-    datos_tabla_filtrados = datos[
+    datos = datos[
         (datos["IdTiempoRegistro"] >= start_time) &
         (datos["IdTiempoRegistro"] <= end_time)
     ]
-    
-    fig_3=go.Figure()
 
-    if variable=='Nivel':
+    datos_ecologico=datos["Valor_oferta"]
+    datos_ecologico = datos_ecologico.apply(min_ecologico)
+    dato_min_eco=[]
+    Q_requerido=[]
+    for i in range(len(datos["Valor_oferta"])):
+        Q_requerido.append(4.18)
+        dato_min_eco.append(1.83)
 
-        fig_3.add_trace(go.Scatter(x=datos_tabla_filtrados['IdTiempoRegistro'],y=datos_tabla_filtrados['Nivel'], fill='tozeroy'))
-        fig_3.update_traces(marker_color='LightSteelBlue')
-        fig_3.update_layout(
-            plot_bgcolor='white',
-            paper_bgcolor='LightSteelBlue',
-            yaxis_title=variable,
-            xaxis_title=None,
-            margin=dict(l=30, r=30, t=0, b=40),
-            height=400,
-            showlegend=False
-        )
 
-    elif variable=='Caudal':
+    fig_1=go.Figure()
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_oferta'], fill=None, name='Oferta',line=dict(color="blue")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Q 4.180 L/s', line=dict(color="purple")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Q Ambiental (EEP)', line=dict(color="gray")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Q Parshal', line=dict(color="rgb(222,144,0)")))
+    #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Q AMB mínimo (Carder)', line=dict(color="red")))
+    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Q AMB min (1.830 L/s)', line=dict(color="red")))
 
-        fig_3.add_trace(go.Scatter(x=datos_tabla_filtrados['IdTiempoRegistro'],y=datos_tabla_filtrados['Caudal'], fill='tozeroy'))
-        fig_3.update_traces(marker_color='LightSteelBlue')
-        fig_3.update_layout(
-            plot_bgcolor='white',
-            paper_bgcolor='LightSteelBlue',
-            yaxis_title=variable,
-            xaxis_title=None,
-            margin=dict(l=30, r=30, t=0, b=40),
-            height=400,
-            showlegend=False
-        )
+    fig_1.update_traces(marker_color='LightSteelBlue')
+    fig_1.update_xaxes(showticklabels=True)
+    fig_1.update_yaxes(range=[None, None])
+    fig_1.update_layout(
+        plot_bgcolor='white',
+        paper_bgcolor='LightSteelBlue',
+        yaxis_title='Caudales de bocatoma Nuevo Libaré',
+        xaxis_title='HORA - FECHA',
+        margin=dict(l=30, r=30, t=30, b=0),
+        height=500,
+        showlegend=True
+    )
 
-    return fig_3
+    fig_4= go.Figure(data=[go.Table(
+    header=dict(values=['Estación', 'Max', 'Prom', 'Min'],
+                line_color='darkslategray',
+                fill_color='lightskyblue',
+                align='left'),
+    cells=dict(values=[["Oferta", "Captación", "Ambiental"],
+                       [max(datos['Valor_oferta']), max(datos['Valor_parshal']), max(datos['Valor_ecologico']) ],
+                       [round(statistics.mean(datos['Valor_oferta']),2),  round(statistics.mean(datos['Valor_parshal']),2), round(statistics.mean(datos['Valor_ecologico']),2)],
+                       [min(datos['Valor_oferta']), min(datos['Valor_parshal']), min(datos['Valor_ecologico'])]],
+                       
+               line_color='darkslategray',
+               fill_color='lightcyan',
+               align='left'))
+    ])
+
+    fig_4.update_layout(width=290, height=150, margin=dict(l=0, r=0, t=20, b=0))
+
+    fig_5= go.Figure(data=[go.Table(
+    header=dict(values=['Caudal amb', 'Caudal min', 'Cumplimiento'],
+                line_color='darkslategray',
+                fill_color='lightskyblue',
+                align='left'),
+    cells=dict(values=[[datos['Valor_ecologico'].iloc[-1]],
+                       [datos_ecologico.iloc[-1]],
+                       [round(datos['Valor_ecologico'].iloc[-1]*100/ datos_ecologico.iloc[-1], 2)]],
+               line_color='darkslategray',
+               fill_color='lightcyan',
+               align='left'))
+    ])
+    fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
+
+    return fig_1, fig_4, fig_5
