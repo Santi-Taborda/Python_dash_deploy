@@ -184,11 +184,12 @@ def update_monitor_lluvia(date_time,n):
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Q 4.180 L/s', line=dict(color="purple")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Q Ambiental (EEP)', line=dict(color="gray")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Q Parshal', line=dict(color="rgb(222,144,0)")))
-    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Q AMB mínimo (Carder)', line=dict(color="rgb(173,0,0)")))
+    #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Q AMB mínimo (Carder)', line=dict(color="red")))
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Q AMB min (1.830 L/s)', line=dict(color="red")))
 
     fig_1.update_traces(marker_color='LightSteelBlue')
     fig_1.update_xaxes(showticklabels=True)
+    fig_1.update_yaxes(range=[None, None])
     fig_1.update_layout(
         plot_bgcolor='white',
         paper_bgcolor='LightSteelBlue',
@@ -230,4 +231,4 @@ def update_monitor_lluvia(date_time,n):
     ])
     fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
-    return fig_1, fig_4, fig_5
+    return fig_1, fig_4, fig_5 
