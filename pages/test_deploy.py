@@ -9,6 +9,12 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
+
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -25,7 +31,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (2, 9, 12, 21, 22, 14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3, 82, 80, 122, 87, 89) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 31, 122) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
@@ -51,7 +57,7 @@ def obtener_fecha():
     engine = create_engine(env.get('DB_URL'), echo=True)
 
     # Consultas SQL
-    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3)"
+    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3, 122)"
     #query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14)"
 
     datos_tabla = pd.read_sql(query1, engine)
@@ -133,7 +139,11 @@ layout= dbc.Container(children=[
 
 def update_slider(n):
     min_actualized,max_actualized =obtener_fecha()
+    time_max=pd.to_datetime(max_actualized, unit='s')
+    time= datetime.now()
+
     return (min_actualized, max_actualized,[min_actualized,max_actualized])
+
 
 @callback(
     Output('monitor', 'figure'),
@@ -180,8 +190,7 @@ def update_monitor(date_time, stations, variable,n):
                 'name': figure
             },
             row=index+1, col=1)
-            fig.update_yaxes(title_text=variable, row=index+1, col=1)
+            fig.update_yaxes(title_text=variable, range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1)
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
-    
