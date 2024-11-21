@@ -12,7 +12,7 @@ cards = [
                 dcc.Link("Monitor de variables", href="https://satma-dashboards.onrender.com/aya/monitor", className="stretched-link"),
             ]
         ),
-        className="shadow p-3 mb-5 bg-white rounded",
+        className="shadow p-3 bg-white rounded",
         style={'width': '30rem', "textAlign": "center"}
     ),
     dbc.Card(
@@ -26,10 +26,23 @@ cards = [
         className="shadow p-3 mb-5 bg-white rounded",
         style={'width': '30rem', "textAlign": "center"}
     ),
+    
+
     dbc.Card(
         dbc.CardBody(
             [
-                html.Img(src="https://cdn.pixabay.com/photo/2020/03/28/15/10/high-water-4977406_1280.jpg", className="img-fluid"),
+                html.Img(src="/assets/cuenca_otun.png", className="img-fluid"),
+                html.Div(style={'margin-bottom': '10px'}),
+                dcc.Link("Monitoreo Cuenca Otún", href="https://satma-dashboards.onrender.com/aya/variables_otun", className="stretched-link"),
+            ]
+        ),
+        className="shadow p-3 mb-5 bg-white rounded",
+        style={'width': '30rem', "textAlign": "center"}
+    ),
+    dbc.Card(
+        dbc.CardBody(
+            [
+                html.Img(src="/assets/bocatoma_nuevo_libare.jpeg", className="img-fluid"),
                 html.Div(style={'margin-bottom': '10px'}),
                 dcc.Link("Bocatoma Nuevo Libaré", href="https://satma-dashboards.onrender.com/aya/bocatoma_nuevo_libare", className="stretched-link"),
             ]
@@ -44,6 +57,6 @@ layout = dbc.Container(
         justify="center",
         align="center",),
     fluid=True,
-    className="d-flex align-items-center vh-100",
+    className="align-items-center",
     style={'background-color':'AliceBlue'}
 )
