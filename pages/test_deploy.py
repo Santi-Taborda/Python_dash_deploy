@@ -9,12 +9,6 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-env['DB_USER']='utpmon'
-env['DB_PASSWORD']='UtpM0n1t0r'
-env['DB_HOST']='194.163.137.37'
-env['DB_PORT']='3306'
-env['DB_NAME']='upt_monestaciones'
-
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -31,7 +25,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 31, 122) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (3, 8, 9, 10, 14, 16, 21, 22, 23, 24, 25, 26, 79, 80, 84, 87, 88, 89, 122) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
@@ -57,7 +51,7 @@ def obtener_fecha():
     engine = create_engine(env.get('DB_URL'), echo=True)
 
     # Consultas SQL
-    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3, 122)"
+    query1 = "SELECT IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (3, 8, 9, 10, 14, 16, 21, 22, 23, 24, 25, 26, 79, 80, 84, 87, 88, 89, 122)"
     #query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo_1s WHERE idEstacion IN (14)"
 
     datos_tabla = pd.read_sql(query1, engine)
