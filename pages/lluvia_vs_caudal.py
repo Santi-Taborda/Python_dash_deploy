@@ -10,6 +10,12 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
+
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -37,8 +43,8 @@ def obtener_datos():
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
     
-    query1 = "SELECT idVariable, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor FROM factmonitoreo WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL  AND Valor <=55 GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
-    query2 = "SELECT idVariable, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor FROM factmonitoreo WHERE idEstacion IN (31,84) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL AND Valor >=2 GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    query1 = "SELECT idVariable, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor FROM factmonitoreo WHERE idEstacion IN (14, 31, 26, 84, 24, 25, 79, 23, 10, 15, 8, 3) AND IdVariable in (2) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
+    query2 = "SELECT idVariable, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) AS IdTiempoRegistro, round(SUM(Valor), 2) AS Valor FROM factmonitoreo WHERE idEstacion IN (84,31) AND IdVariable in (12) AND IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL GROUP BY FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(IdTiempoRegistro) / 300) * 300) "
     datos_tabla_1 = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
     datos_tabla_2 = pd.read_sql(query2, engine,  params=(hace_40_dias_str, hora_actual_str))
 
@@ -109,8 +115,8 @@ layout= dbc.Container(children=[
    [Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'min'),
     Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'max'),
     Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'value'),],
-   Input('interval-component', 'n_intervals') 
-)
+    Input('interval-component', 'n_intervals') 
+    )
 
 def update_slider(n):
     datos,min_actualized,max_actualized =obtener_datos()
@@ -159,5 +165,6 @@ def update_monitor_lluvia(date_time,n):
         margin=dict(l=30, r=30, t=0, b=30),
         height=250
     )
+    fig_2.update_yaxes(range=[None, None])
 
     return fig_1,fig_2
