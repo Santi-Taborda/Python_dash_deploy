@@ -31,7 +31,7 @@ cards = [
     dbc.Card(
         dbc.CardBody(
             [
-                html.Img(src="/assets/cuenca_otun.png", className="img-fluid"),
+                html.Img(src="/assets/Cuenca_otun.png", className="img-fluid"),
                 html.Div(style={'margin-bottom': '10px'}),
                 dcc.Link("Monitoreo Cuenca Otún", href="https://satma-dashboards.onrender.com/aya/variables_otun", className="stretched-link"),
             ]
