@@ -137,7 +137,7 @@ def update_monitor_lluvia(date_time,n):
     ]
 
     fig_1=px.bar(datos,x='IdTiempoRegistro',y='Valor_x')
-    fig_1.update_traces(marker_color='LightSteelBlue')
+    fig_1.update_traces(marker_color="rgb(0,178,255)")
     fig_1.update_xaxes(showticklabels=False)
     fig_1.update_layout(
         plot_bgcolor='white',
@@ -149,7 +149,7 @@ def update_monitor_lluvia(date_time,n):
         height=250
     )
     fig_2=go.Figure()
-    fig_2.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_y'], fill='tozeroy',line=dict(color="gray")))
+    fig_2.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_y'], fill='tozeroy',line=dict(color="blue")))
     fig_2.update_traces(marker_color='LightSteelBlue')
     fig_2.update_layout(
         plot_bgcolor='white',
