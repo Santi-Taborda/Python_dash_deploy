@@ -20,7 +20,7 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
  
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
-    fecha_40_dias_atras=fecha_actual - timedelta(days=7)
+    fecha_40_dias_atras=fecha_actual - timedelta(days=3)
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
 # Conexión a la base de datos MySQL
@@ -185,5 +185,6 @@ def update_monitor_otun(date_time, variable,n):
         if variable!="Precipitación":
             fig.update_layout(title_text=titulo, showlegend=False, height=len(cant_figures)*200, margin=dict(l=40, r=30, t=50, b=50), autosize=True, paper_bgcolor="LightSteelBlue", xaxis_title=None)
         else:
-            fig.update_layout(title_text=titulo, showlegend=False, height=len(cant_figures)*200, margin=dict(l=40, r=30, t=50, b=50), autosize=True, paper_bgcolor="LightSteelBlue", xaxis_title=None, plot_bgcolor="rgb(76,125,138)")
+            fig.update_layout(title_text=titulo, showlegend=False, height=len(cant_figures)*200, margin=dict(l=40, r=30, t=50, b=50), autosize=True, paper_bgcolor="LightSteelBlue", xaxis_title=None, plot_bgcolor="white")
+            fig.update_traces(marker_color="rgb(0,178,255)")
     return fig
