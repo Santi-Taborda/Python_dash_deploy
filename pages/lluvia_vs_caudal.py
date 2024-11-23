@@ -109,7 +109,7 @@ layout= dbc.Container(children=[
    [Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'min'),
     Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'max'),
     Output('datetime_range_slider_lluvia_vs_caudal_AyA', 'value'),],
-    Input('interval-component', 'n_intervals') 
+    Input('interval_component', 'n_intervals') 
     )
 
 def update_slider(n):
