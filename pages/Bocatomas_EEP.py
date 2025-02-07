@@ -11,6 +11,14 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
+env['DB_USER']='utpmon'
+env['DB_PASSWORD']='UtpM0n1t0r'
+#env['DB_USER']='utpConsulta'
+#env['DB_PASSWORD']='UtpC0nsult@'
+env['DB_HOST']='194.163.137.37'
+env['DB_PORT']='3306'
+env['DB_NAME']='upt_monestaciones'
+
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -204,6 +212,7 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         datos,min_actualized,max_actualized=obtener_datos_NL()
         q_requerido_vb=4.18
         dato_min_eco_vb=1.83
+        dato_parshal_vb=2.6
     if Bocatoma=='Bocatoma Belmonte':
         datos,min_actualized,max_actualized=obtener_datos_B()
         q_requerido_vb=4.18
@@ -223,6 +232,7 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
     datos_ecologico = datos_ecologico.apply(min_ecologico)
     dato_min_eco=[]
     Q_requerido=[]
+    dato_parshal=[]
     if Bocatoma=='Bocatoma Belmonte':
         for i in range(len(datos["Valor_oferta"])):
             Q_requerido.append(q_requerido_vb)
@@ -232,17 +242,19 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         for i in range(len(datos["Valor_oferta"])):
             Q_requerido.append(q_requerido_vb)
             dato_min_eco.append(dato_min_eco_vb)
+            dato_parshal.append(dato_parshal_vb)
 
     fig_1=go.Figure()
     fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_oferta'], fill=None, name='Oferta',line=dict(color="blue")))
     if Bocatoma=='Bocatoma Nuevo Libaré':
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
+        #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Caudal Ecológico', line=dict(color="gray")))
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental mínimo', line=dict(color="red")))
+        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_parshal, name='Caudal operación Aguas', line=dict(color="black")))
+        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=(datos['Valor_ecologico']-datos_ecologico)*0.8, name='GENERACIÓN', line=dict(color="green")))
     if Bocatoma=='Bocatoma Belmonte':
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos_ecologico_B, fill=None,name='Caudal Ecológico', line=dict(color="gray")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
         fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
         #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo', line=dict(color="red")))
 
@@ -298,13 +310,15 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
 
     if Bocatoma=='Bocatoma Nuevo Libaré':
         fig_5= go.Figure(data=[go.Table(
-        header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento'],
+        header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento', 'Posible generación'],
                     line_color='darkslategray',
                     fill_color='lightskyblue',
                     align='left'),
         cells=dict(values=[[datos['Valor_ecologico'].iloc[-1]],
                         [datos_ecologico.iloc[-1]],
-                        [round(datos['Valor_ecologico'].iloc[-1]*100/ datos_ecologico.iloc[-1], 2)]],
+                        [round(datos['Valor_ecologico'].iloc[-1]*100/ datos_ecologico.iloc[-1], 2)],
+                        [round((datos['Valor_ecologico'].iloc[-1]-datos_ecologico.iloc[-1])*0.8, 2)]],
+                        
                 line_color='darkslategray',
                 fill_color='lightcyan',
                 align='left'))
@@ -327,4 +341,3 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
     return fig_1, fig_4, fig_5
-
