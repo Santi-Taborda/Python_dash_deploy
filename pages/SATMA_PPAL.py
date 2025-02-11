@@ -282,7 +282,7 @@ def update_map(_, n):
             ])
 
         elif estacion['IdTipoEstacion'].iloc[0]==10:
-            icon=icon_ECT
+            icon=icon_EHT
             dbc_tabs=dbc.Tabs([
             dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
             dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
@@ -291,7 +291,7 @@ def update_map(_, n):
             ])
             
         elif estacion['IdTipoEstacion'].iloc[0]==11:
-            icon=icon_ECT
+            icon=icon_EHT
             dbc_tabs=dbc.Tabs([
             dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
             dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
