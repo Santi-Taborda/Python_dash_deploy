@@ -10,19 +10,12 @@ from datetime import datetime, timedelta
 import numpy
 from os import environ as env
 
-env['DB_USER']='AdmSanti'
-env['DB_PASSWORD']='S4nt14dm1n0307'
-env['DB_HOST']='10.1.4.51'
-#env['DB_HOST']='201.131.90.70'
-env['DB_PORT']='3306'
-env['DB_NAME']='satma'
-
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
-    user=env['DB_USER'],
-    password=env['DB_PASSWORD'],
-    host=env['DB_HOST'],
+    user=env['DB_USER_4'],
+    password=env['DB_PASSWORD_4'],
+    host=env['DB_HOST_2'],
     port=env['DB_PORT'],
-    name=env['DB_NAME']
+    name=env['DB_NAME_SATMA']
     )
  
 def Enviar_datos(api_key, id, temp, hum, PM10, PM25, PM100):
