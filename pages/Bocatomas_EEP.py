@@ -11,7 +11,6 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -76,8 +75,12 @@ def obtener_datos_B():
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
-    time_data_min=min(datos_tabla["timestamp"])
-    time_data_max=max(datos_tabla["timestamp"])
+    if datos_tabla.empty:
+        time_data_min=0
+        time_data_max=0
+    else:
+        time_data_min=min(datos_tabla["timestamp"])
+        time_data_max=max(datos_tabla["timestamp"])
 
     return (datos_tabla, time_data_min, time_data_max)
 
@@ -111,8 +114,12 @@ def obtener_datos_NL():
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla["timestamp"] = datos_tabla["IdTiempoRegistro"].astype('int64') // 10**9
     datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
-    time_data_min=min(datos_tabla["timestamp"])
-    time_data_max=max(datos_tabla["timestamp"])
+    if datos_tabla.empty:
+        time_data_min=0
+        time_data_max=0
+    else:
+        time_data_min=min(datos_tabla["timestamp"])
+        time_data_max=max(datos_tabla["timestamp"])
 
     return (datos_tabla, time_data_min, time_data_max)
 
@@ -213,124 +220,130 @@ def update_monitor_lluvia(date_time,n,Bocatoma):
         datos_ecologico_B=[]
 
     
-    start_time = pd.to_datetime(date_time[0], unit='s', utc=True)
-    end_time = pd.to_datetime(date_time[1], unit='s', utc=True)
+    if datos.empty:
+        return px.scatter(title='No hay datos disponibles'), px.scatter(title='No hay datos disponibles'), px.scatter(title='No hay datos disponibles')
 
-    datos = datos[
-        (datos["IdTiempoRegistro"] >= start_time) &
-        (datos["IdTiempoRegistro"] <= end_time)
-    ]
+    else:
+        start_time = pd.to_datetime(date_time[0], unit='s', utc=True)
+        end_time = pd.to_datetime(date_time[1], unit='s', utc=True)
 
-    datos_ecologico=datos["Valor_oferta"]
-    datos_ecologico = datos_ecologico.apply(min_ecologico)
-    dato_min_eco=[]
-    Q_requerido=[]
-    dato_parshal=[]
-    if Bocatoma=='Bocatoma Belmonte':
-        for i in range(len(datos["Valor_oferta"])):
-            Q_requerido.append(q_requerido_vb)
-            dato_min_eco.append(dato_min_eco_vb)
-            datos_ecologico_B.append(round(datos["Valor_oferta"][i]-datos["Valor_parshal"][i],2))
-    if Bocatoma=='Bocatoma Nuevo Libaré':
-        for i in range(len(datos["Valor_oferta"])):
-            Q_requerido.append(q_requerido_vb)
-            dato_min_eco.append(dato_min_eco_vb)
-            dato_parshal.append(dato_parshal_vb)
+        datos = datos[
+            (datos["IdTiempoRegistro"] >= start_time) &
+            (datos["IdTiempoRegistro"] <= end_time)
+        ]
 
-    fig_1=go.Figure()
-    fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_oferta'], fill=None, name='Oferta',line=dict(color="blue")))
-    if Bocatoma=='Bocatoma Nuevo Libaré':
-        #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Caudal Ecológico', line=dict(color="gray")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental mínimo', line=dict(color="red")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_parshal, name='Caudal operación Aguas', line=dict(color="black")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=(datos['Valor_ecologico']-datos_ecologico)*0.8, name='GENERACIÓN', line=dict(color="green")))
-    if Bocatoma=='Bocatoma Belmonte':
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos_ecologico_B, fill=None,name='Caudal Ecológico', line=dict(color="gray")))
-        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
-        #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo', line=dict(color="red")))
+        datos_ecologico=datos["Valor_oferta"]
+        datos_ecologico = datos_ecologico.apply(min_ecologico)
+        dato_min_eco=[]
+        Q_requerido=[]
+        dato_parshal=[]
+        if Bocatoma=='Bocatoma Belmonte':
+            for i in range(len(datos["Valor_oferta"])):
+                Q_requerido.append(q_requerido_vb)
+                dato_min_eco.append(dato_min_eco_vb)
+                datos_ecologico_B.append(round(datos["Valor_oferta"][i]-datos["Valor_parshal"][i],2))
+        if Bocatoma=='Bocatoma Nuevo Libaré':
+            for i in range(len(datos["Valor_oferta"])):
+                Q_requerido.append(q_requerido_vb)
+                dato_min_eco.append(dato_min_eco_vb)
+                dato_parshal.append(dato_parshal_vb)
 
-    fig_1.update_traces(marker_color='LightSteelBlue')
-    fig_1.update_xaxes(showticklabels=True)
-    fig_1.update_layout(
-        plot_bgcolor='white',
-        paper_bgcolor='LightSteelBlue',
-        yaxis_title='Caudales de bocatoma Nuevo Libaré',
-        xaxis_title='HORA - FECHA',
-        margin=dict(l=30, r=30, t=30, b=0),
-        height=500,
-        showlegend=True
-    )
+        fig_1=go.Figure()
+        fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_oferta'], fill=None, name='Oferta',line=dict(color="blue")))
+        if Bocatoma=='Bocatoma Nuevo Libaré':
+            #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=Q_requerido, name='Caudal requerido 4.180 L/s', line=dict(color="purple")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_ecologico'], fill=None,name='Caudal Ecológico', line=dict(color="gray")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos['Valor_parshal'], fill=None,name='Captación', line=dict(color="rgb(222,144,0)")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental mínimo', line=dict(color="red")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_parshal, name='Caudal operación Aguas', line=dict(color="black")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=(datos['Valor_ecologico']-datos_ecologico)*0.8, name='GENERACIÓN', line=dict(color="green")))
+        if Bocatoma=='Bocatoma Belmonte':
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'],y=datos_ecologico_B, fill=None,name='Caudal Ecológico', line=dict(color="gray")))
+            fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos_ecologico, name='Caudal ambiental', line=dict(color="red")))
+            #fig_1.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=dato_min_eco, name='Caudal ambiental mínimo', line=dict(color="red")))
 
-    if Bocatoma=='Bocatoma Belmonte':
+        fig_1.update_traces(marker_color='LightSteelBlue')
+        fig_1.update_xaxes(showticklabels=True)
+        fig_1.update_layout(
+            plot_bgcolor='white',
+            paper_bgcolor='LightSteelBlue',
+            yaxis_title='Caudales de bocatoma Nuevo Libaré',
+            xaxis_title='HORA - FECHA',
+            margin=dict(l=30, r=30, t=30, b=0),
+            height=500,
+            showlegend=True
+        )
 
-        fig_4= go.Figure(data=[go.Table(
-        header=dict(values=['Estación', 'Max', 'Prom', 'Min'],
+        if Bocatoma=='Bocatoma Belmonte':
+
+            fig_4= go.Figure(data=[go.Table(
+            header=dict(values=['Estación', 'Max', 'Prom', 'Min'],
+                        line_color='darkslategray',
+                        fill_color='lightskyblue',
+                        align='left'),
+            cells=dict(values=[["Oferta", "Captación", "Ecológico"],
+                            [max(datos['Valor_oferta']), max(datos['Valor_parshal']), max(datos_ecologico_B) ],
+                            [round(statistics.mean(datos['Valor_oferta']),2),  round(statistics.mean(datos['Valor_parshal']),2), round(statistics.mean(datos_ecologico_B),2)],
+                            [min(datos['Valor_oferta']), min(datos['Valor_parshal']), min(datos_ecologico_B)]],
+                            
                     line_color='darkslategray',
-                    fill_color='lightskyblue',
-                    align='left'),
-        cells=dict(values=[["Oferta", "Captación", "Ecológico"],
-                        [max(datos['Valor_oferta']), max(datos['Valor_parshal']), max(datos_ecologico_B) ],
-                        [round(statistics.mean(datos['Valor_oferta']),2),  round(statistics.mean(datos['Valor_parshal']),2), round(statistics.mean(datos_ecologico_B),2)],
-                        [min(datos['Valor_oferta']), min(datos['Valor_parshal']), min(datos_ecologico_B)]],
-                        
-                line_color='darkslategray',
-                fill_color='lightcyan',
-                align='left'))
-        ])
+                    fill_color='lightcyan',
+                    align='left'))
+            ])
 
-        fig_4.update_layout(width=290, height=150, margin=dict(l=0, r=0, t=20, b=0))
+            fig_4.update_layout(width=290, height=150, margin=dict(l=0, r=0, t=20, b=0))
 
-    if Bocatoma=='Bocatoma Nuevo Libaré':
-        fig_4= go.Figure(data=[go.Table(
-        header=dict(values=['Estación', 'Max', 'Prom', 'Min'],
+        if Bocatoma=='Bocatoma Nuevo Libaré':
+            fig_4= go.Figure(data=[go.Table(
+            header=dict(values=['Estación', 'Max', 'Prom', 'Min'],
+                        line_color='darkslategray',
+                        fill_color='lightskyblue',
+                        align='left'),
+            cells=dict(values=[["Oferta", "Captación", "Ecológico"],
+                            [max(datos['Valor_oferta']), max(datos['Valor_parshal']), max(datos['Valor_ecologico']) ],
+                            [round(statistics.mean(datos['Valor_oferta']),2),  round(statistics.mean(datos['Valor_parshal']),2), round(statistics.mean(datos['Valor_ecologico']),2)],
+                            [min(datos['Valor_oferta']), min(datos['Valor_parshal']), min(datos['Valor_ecologico'])]],
+                            
                     line_color='darkslategray',
-                    fill_color='lightskyblue',
-                    align='left'),
-        cells=dict(values=[["Oferta", "Captación", "Ecológico"],
-                        [max(datos['Valor_oferta']), max(datos['Valor_parshal']), max(datos['Valor_ecologico']) ],
-                        [round(statistics.mean(datos['Valor_oferta']),2),  round(statistics.mean(datos['Valor_parshal']),2), round(statistics.mean(datos['Valor_ecologico']),2)],
-                        [min(datos['Valor_oferta']), min(datos['Valor_parshal']), min(datos['Valor_ecologico'])]],
-                        
-                line_color='darkslategray',
-                fill_color='lightcyan',
-                align='left'))
-        ])
+                    fill_color='lightcyan',
+                    align='left'))
+            ])
 
-        fig_4.update_layout(width=290, height=150, margin=dict(l=0, r=0, t=20, b=0))
+            fig_4.update_layout(width=290, height=150, margin=dict(l=0, r=0, t=20, b=0))
 
 
-    if Bocatoma=='Bocatoma Nuevo Libaré':
-        fig_5= go.Figure(data=[go.Table(
-        header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento', 'Posible generación'],
+        if Bocatoma=='Bocatoma Nuevo Libaré':
+            fig_5= go.Figure(data=[go.Table(
+            header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento', 'Posible generación'],
+                        line_color='darkslategray',
+                        fill_color='lightskyblue',
+                        align='left'),
+            cells=dict(values=[[datos['Valor_ecologico'].iloc[-1]],
+                            [datos_ecologico.iloc[-1]],
+                            [round(datos['Valor_ecologico'].iloc[-1]*100/ datos_ecologico.iloc[-1], 2)],
+                            [round((datos['Valor_ecologico'].iloc[-1]-datos_ecologico.iloc[-1])*0.8, 2)]],
+                            
                     line_color='darkslategray',
-                    fill_color='lightskyblue',
-                    align='left'),
-        cells=dict(values=[[datos['Valor_ecologico'].iloc[-1]],
-                        [datos_ecologico.iloc[-1]],
-                        [round(datos['Valor_ecologico'].iloc[-1]*100/ datos_ecologico.iloc[-1], 2)],
-                        [round((datos['Valor_ecologico'].iloc[-1]-datos_ecologico.iloc[-1])*0.8, 2)]],
-                        
-                line_color='darkslategray',
-                fill_color='lightcyan',
-                align='left'))
-        ])
-        fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
-    
-    if Bocatoma=='Bocatoma Belmonte':
-        fig_5= go.Figure(data=[go.Table(
-        header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento'],
+                    fill_color='lightcyan',
+                    align='left'))
+            ])
+            fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
+        
+        if Bocatoma=='Bocatoma Belmonte':
+            fig_5= go.Figure(data=[go.Table(
+            header=dict(values=['Caudal eco', 'Caudal min', 'Cumplimiento'],
+                        line_color='darkslategray',
+                        fill_color='lightskyblue',
+                        align='left'),
+            cells=dict(values=[[datos_ecologico_B[-1]],
+                            [datos_ecologico.iloc[-1]],
+                            [round(datos_ecologico_B[-1]*100/ datos_ecologico.iloc[-1], 2)]],
                     line_color='darkslategray',
-                    fill_color='lightskyblue',
-                    align='left'),
-        cells=dict(values=[[datos_ecologico_B[-1]],
-                        [datos_ecologico.iloc[-1]],
-                        [round(datos_ecologico_B[-1]*100/ datos_ecologico.iloc[-1], 2)]],
-                line_color='darkslategray',
-                fill_color='lightcyan',
-                align='left'))
-        ])
-        fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
+                    fill_color='lightcyan',
+                    align='left'))
+            ])
+            fig_5.update_layout(width=290, height=100, margin=dict(l=0, r=0, t=0, b=10))
 
-    return fig_1, fig_4, fig_5
+        return fig_1, fig_4, fig_5
+
+
