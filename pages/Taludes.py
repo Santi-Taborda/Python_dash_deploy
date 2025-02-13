@@ -80,7 +80,7 @@ datos_nodos= tabla_nodo()
 datos_tabla = obtener_datos(datos_nodos)
 sound=False
 
-register_page(__name__, name="Taludes", path='Pereira/taludes')
+register_page(__name__, name="Taludes", path='/Pereira/taludes')
 
 layout= dbc.Container(children=[
     html.Div(
