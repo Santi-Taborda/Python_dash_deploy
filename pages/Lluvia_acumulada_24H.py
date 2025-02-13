@@ -1,4 +1,3 @@
-"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
@@ -137,4 +136,3 @@ def update_monitor(stations,n):
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, plot_bgcolor="white", paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=50, b=50))
     return fig
-    """
