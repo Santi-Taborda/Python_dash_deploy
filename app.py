@@ -5,6 +5,7 @@ app= Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.CERULEAN])
 server=app.server
 
 # Define the navigation bar
+"""
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("HOME", href="/")),
@@ -14,9 +15,9 @@ navbar = dbc.NavbarSimple(
     color="dark",
     dark=True,
 )
-
+"""
 app.layout =html.Div([
-    navbar,
+    #navbar,
     page_container
 ])
 if __name__ == '__main__':
