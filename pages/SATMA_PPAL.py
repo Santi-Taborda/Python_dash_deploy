@@ -72,7 +72,7 @@ def obtener_datos():
 datos_tabla, estaciones=obtener_datos()
 name=""
 
-register_page(__name__, name="SATMA_PRUEBAS", path='/PRUEBAS')
+register_page(__name__, name="SATMA_PPAL", path='/SATMA_PPAL')
 
 layout = dbc.Container([
     dcc.Store(id='selected_station', data=None),  # Estado del marcador seleccionado
