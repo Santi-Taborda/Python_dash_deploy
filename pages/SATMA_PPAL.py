@@ -79,7 +79,7 @@ layout = dbc.Container([
     dl.Map(center=[5.0381, -75.5950], zoom=10, children=[
         dl.TileLayer(),
         dl.LayerGroup(id="layer_SATMA_p")
-    ], style={'width': '100%', 'height': '80vh'}),
+    ], style={'width': '100%', 'height': '100vh'}),
     dcc.Interval(id='interval-component', interval=5*60*1000, n_intervals=0)
 ], fluid=True)
 
