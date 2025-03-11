@@ -10,3 +10,4 @@ dash_bootstrap_components
 dash_leaflet
 geoglows
 pytz
+zarr
