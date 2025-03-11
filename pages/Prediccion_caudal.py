@@ -135,7 +135,7 @@ layout = dbc.Container(children=[
             width=3),
         dbc.Col(
             children=[
-                dcc.Graph(id='monitor_oferta_caudal_predict_aya'),
+                dcc.Graph(id='monitor_oferta_caudal_predict_aya', figure=figura),
             ],
             style={'overflowY': 'scroll', 'height': '100%'},
             width=9)
