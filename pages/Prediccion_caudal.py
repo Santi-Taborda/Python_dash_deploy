@@ -1,3 +1,4 @@
+"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
@@ -157,3 +158,4 @@ def update_graph(n):
     figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
 
     return figura, min_date, min_value, max_date, max_value
+"""
