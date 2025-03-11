@@ -19,24 +19,24 @@ def obtener_datos(variable):
     if variable=='Temperatura':
         id_variable=1
         items_baner_satelital =  [ 
-        {"key": "1", "src": "/assets/temp_1.png"},
-        {"key": "2", "src": "/assets/temp_2.png"},
-        {"key": "3", "src": "/assets/temp_3.png"},
-        {"key": "4", "src": "/assets/temp_4.png"},
-        {"key": "5", "src": "/assets/temp_5.png"},
-        {"key": "6", "src": "/assets/temp_6.png"},
-        {"key": "7", "src": "/assets/temp_7.png"},
+        {"key": "1", "src": "/assets/temp_1.bmp"},
+        {"key": "2", "src": "/assets/temp_2.bmp"},
+        {"key": "3", "src": "/assets/temp_3.bmp"},
+        {"key": "4", "src": "/assets/temp_4.bmp"},
+        {"key": "5", "src": "/assets/temp_5.bmp"},
+        {"key": "6", "src": "/assets/temp_6.bmp"},
+        {"key": "7", "src": "/assets/temp_7.bmp"},
         ]
     elif variable=='Precipitación':
         id_variable=3
         items_baner_satelital =  [ 
-        {"key": "1", "src": "/assets/prec_1.png"},
-        {"key": "2", "src": "/assets/prec_2.png"},
-        {"key": "3", "src": "/assets/prec_3.png"},
-        {"key": "4", "src": "/assets/prec_4.png"},
-        {"key": "5", "src": "/assets/prec_5.png"},
-        {"key": "6", "src": "/assets/prec_6.png"},
-        {"key": "7", "src": "/assets/prec_7.png"},
+        {"key": "1", "src": "/assets/prec_1.bmp"},
+        {"key": "2", "src": "/assets/prec_2.bmp"},
+        {"key": "3", "src": "/assets/prec_3.bmp"},
+        {"key": "4", "src": "/assets/prec_4.bmp"},
+        {"key": "5", "src": "/assets/prec_5.bmp"},
+        {"key": "6", "src": "/assets/prec_6.bmp"},
+        {"key": "7", "src": "/assets/prec_7.bmp"},
         ]
     return (items_baner_satelital)
 
