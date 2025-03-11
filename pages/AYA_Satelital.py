@@ -24,9 +24,9 @@ def obtener_datos(variable):
         id_variable=2
 
     items_baner_satelital =  [ 
-        {"key": "1", "src": "/assets/Cuenca_otun.png"},
-        {"key": "2", "src": "/assets/Cuenca_otun.png"},
-        {"key": "3", "src": "/assets/Cuenca_otun.png"}
+        {"key": "1", "src": "/assets/temp.png"},
+        {"key": "2", "src": "/assets/hum.png"},
+        {"key": "3", "src": "/assets/rain.png"}
         ]
     return (items_baner_satelital)
 
