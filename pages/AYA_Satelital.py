@@ -18,15 +18,25 @@ def obtener_datos(variable):
 
     if variable=='Temperatura':
         id_variable=1
-    elif variable=='Humedad relativa':
-        id_variable=3
+        items_baner_satelital =  [ 
+        {"key": "1", "src": "/assets/temp_1.png"},
+        {"key": "2", "src": "/assets/temp_2.png"},
+        {"key": "3", "src": "/assets/temp_3.png"},
+        {"key": "4", "src": "/assets/temp_4.png"},
+        {"key": "5", "src": "/assets/temp_5.png"},
+        {"key": "6", "src": "/assets/temp_6.png"},
+        {"key": "7", "src": "/assets/temp_7.png"},
+        ]
     elif variable=='Precipitación':
-        id_variable=2
-
-    items_baner_satelital =  [ 
-        {"key": "1", "src": "/assets/temp.png"},
-        {"key": "2", "src": "/assets/hum.png"},
-        {"key": "3", "src": "/assets/rain.png"}
+        id_variable=3
+        items_baner_satelital =  [ 
+        {"key": "1", "src": "/assets/hum_1.png"},
+        {"key": "2", "src": "/assets/hum_2.png"},
+        {"key": "3", "src": "/assets/hum_3.png"},
+        {"key": "4", "src": "/assets/hum_4.png"},
+        {"key": "5", "src": "/assets/hum_5.png"},
+        {"key": "6", "src": "/assets/hum_6.png"},
+        {"key": "7", "src": "/assets/hum_7.png"},
         ]
     return (items_baner_satelital)
 
@@ -51,7 +61,7 @@ layout= dbc.Container(children=[
                     html.H6("Seleccione la variable que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
 
                     dcc.Dropdown(id='variable_button_satelital',
-                                    options=['Temperatura','Humedad relativa','Precipitación'],
+                                    options=['Temperatura','Precipitación'],
                                     value='Temperatura', multi=False, className='mb-3'),
     
                     dcc.Interval(
