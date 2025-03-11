@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import geoglows
+import zarr
 import pytz
 
 def caudal_predict(fecha_inicio, fecha_fin):
