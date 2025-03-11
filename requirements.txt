@@ -8,3 +8,5 @@ plotly
 plotly.express
 dash_bootstrap_components
 dash_leaflet
+geoglows
+pytz
