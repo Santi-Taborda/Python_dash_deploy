@@ -30,13 +30,13 @@ def obtener_datos(variable):
     elif variable=='Precipitación':
         id_variable=3
         items_baner_satelital =  [ 
-        {"key": "1", "src": "/assets/hum_1.png"},
-        {"key": "2", "src": "/assets/hum_2.png"},
-        {"key": "3", "src": "/assets/hum_3.png"},
-        {"key": "4", "src": "/assets/hum_4.png"},
-        {"key": "5", "src": "/assets/hum_5.png"},
-        {"key": "6", "src": "/assets/hum_6.png"},
-        {"key": "7", "src": "/assets/hum_7.png"},
+        {"key": "1", "src": "/assets/prec_1.png"},
+        {"key": "2", "src": "/assets/prec_2.png"},
+        {"key": "3", "src": "/assets/prec_3.png"},
+        {"key": "4", "src": "/assets/prec_4.png"},
+        {"key": "5", "src": "/assets/prec_5.png"},
+        {"key": "6", "src": "/assets/prec_6.png"},
+        {"key": "7", "src": "/assets/prec_7.png"},
         ]
     return (items_baner_satelital)
 
