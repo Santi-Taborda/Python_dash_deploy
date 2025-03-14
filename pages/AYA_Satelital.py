@@ -78,6 +78,7 @@ layout= dbc.Container(children=[
                          items=items_baner_satelital,
                          controls=True,
                          indicators=True,
+                         variant="dark",
                          interval=2000,
                          className="carousel-fade",
 
