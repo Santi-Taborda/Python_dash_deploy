@@ -1,4 +1,3 @@
-"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
@@ -7,8 +6,8 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import geoglows
-import zarr
 import pytz
+import zarr
 
 def caudal_predict(fecha_inicio, fecha_fin):
     reach_id = 610_350_855  # tramo bocatoma
@@ -117,20 +116,20 @@ layout = dbc.Container(children=[
     dbc.Row(children=[
         dcc.Interval(
             id='interval_component',
-            interval=120 * 60 * 1000,  # in milliseconds
+            interval=5 * 60 * 1000,  # in milliseconds
             n_intervals=0),
-        dbc.Col(
+        dbc.Col( id='dates',
             children=[
                 html.H3("Valores extremos"),
                 html.Hr(),
                 html.H5("Fecha del valor mínimo:"),
-                html.H6(min_date),
+                html.H6(min_date.date(), style={'color': 'black'}),
                 html.H5("Valor mínimo:"),
-                html.H6(min_value),
+                html.H6(round(min_value,2), style={'color': 'black'}),
                 html.H5("Fecha del valor máximo:"),
-                html.H6(max_date),
+                html.H6(max_date.date(), style={'color': 'black'}),
                 html.H5("Valor máximo:"),
-                html.H6(max_value),
+                html.H6(round(max_value,2), style={'color': 'black'}),
                 html.Hr(),
             ],
             style={'overflowY': 'scroll', 'height': '100%'},
@@ -157,5 +156,10 @@ def update_graph(n):
     max_actualized = datetime.now(colombia_tz)
     figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
 
-    return figura, min_date, min_value, max_date, max_value
-"""
+    return figura
+
+def update_min_max():
+    min_actualized = (datetime.now(colombia_tz) - timedelta(days=7))
+    max_actualized = datetime.now(colombia_tz)
+    figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
+    return min_date, min_value, max_date, max_value
