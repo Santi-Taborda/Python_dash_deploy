@@ -8,6 +8,6 @@ plotly
 plotly.express
 dash_bootstrap_components
 dash_leaflet
-geoglows
+geoglows==1.0.0-rc.5
 pytz
 zarr
