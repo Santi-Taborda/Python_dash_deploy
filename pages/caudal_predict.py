@@ -159,7 +159,7 @@ def update_graph(n):
     return figura
 
 def update_min_max():
-    min_actualized = (datetime.now(colombia_tz) - timedelta(days=7))
-    max_actualized = datetime.now(colombia_tz)
+    max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
+    min_actualized = datetime.now(colombia_tz)
     figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
     return min_date, min_value, max_date, max_value
