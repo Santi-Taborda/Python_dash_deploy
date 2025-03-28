@@ -152,8 +152,8 @@ layout = dbc.Container(children=[
     [Input('interval_component', 'n_intervals')]
 )
 def update_graph(n):
-    min_actualized = (datetime.now(colombia_tz) - timedelta(days=7))
-    max_actualized = datetime.now(colombia_tz)
+    max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
+    min_actualized = datetime.now(colombia_tz)
     figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
 
     return figura
