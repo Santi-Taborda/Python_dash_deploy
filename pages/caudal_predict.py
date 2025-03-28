@@ -74,7 +74,7 @@ def caudal_predict(fecha_inicio, fecha_fin):
     # Graficar usando GeoGLOWS
     geoglows.plots.forecast_stats(filtered_stats)
 
-    stats_modified = stats_modified.loc[:'2025-03-17 08:00:00-05:00']
+    stats_modified = stats_modified.loc[:end_date]
     geoglows.plots.forecast_stats(stats_modified)
 
     fig = geoglows.plots.forecast_stats(stats_modified)
@@ -97,8 +97,8 @@ def caudal_predict(fecha_inicio, fecha_fin):
 colombia_tz = pytz.timezone("America/Bogota")
 
 # Convertir las fechas a la zona horaria de Colombia
-min_actualized = (datetime.now(colombia_tz) - timedelta(days=7))
-max_actualized = datetime.now(colombia_tz)
+max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
+min_actualized = datetime.now(colombia_tz)
 figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
 
 register_page(__name__, name="Predicción de caudales Bocatoma Nuevo Libaré", path='/aya/caudal_predict')
