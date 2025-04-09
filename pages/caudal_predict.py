@@ -156,10 +156,18 @@ def update_graph(n):
     min_actualized = datetime.now(colombia_tz)
     figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
 
-    return figura
+    dates_children = [
+    html.H3("Valores extremos"),
+    html.Hr(),
+    html.H5("Fecha del valor mínimo:"),
+    html.H6(min_date.date(), style={'color': 'black'}),
+    html.H5("Valor mínimo:"),
+    html.H6(round(min_value, 2), style={'color': 'black'}),
+    html.H5("Fecha del valor máximo:"),
+    html.H6(max_date.date(), style={'color': 'black'}),
+    html.H5("Valor máximo:"),
+    html.H6(round(max_value, 2), style={'color': 'black'}),
+    html.Hr(),
+    ]
 
-def update_min_max():
-    max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
-    min_actualized = datetime.now(colombia_tz)
-    figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
-    return min_date, min_value, max_date, max_value
+    return figura, dates_children
