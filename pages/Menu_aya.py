@@ -50,6 +50,28 @@ cards = [
         className="shadow p-3 mb-5 bg-white rounded",
         style={'width': '30rem', "textAlign": "center"}
     ),
+    dbc.Card(
+        dbc.CardBody(
+            [
+                html.Img(src="assets\prec_1.bmp", className="img-fluid"),
+                html.Div(style={'margin-bottom': '10px'}),
+                dcc.Link("Predicción climática", href="https://satma-dashboards.onrender.com/aya/satelital", className="stretched-link"),
+            ]
+        ),
+        className="shadow p-3 mb-5 bg-white rounded",
+        style={'width': '30rem', "textAlign": "center"}
+    ),
+    dbc.Card(
+        dbc.CardBody(
+            [
+                html.Img(src="assets\Caudal_predict.png", className="img-fluid"),
+                html.Div(style={'margin-bottom': '10px'}),
+                dcc.Link("Predicción caudal", href="https://satma-dashboards.onrender.com/aya/caudal_predict", className="stretched-link"),
+            ]
+        ),
+        className="shadow p-3 mb-5 bg-white rounded",
+        style={'width': '30rem', "textAlign": "center"}
+    ),
 ]
 
 layout = dbc.Container(
