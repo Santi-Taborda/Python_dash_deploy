@@ -114,7 +114,7 @@ def update_monitor_ecotec(grupo,n):
         fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=dict_variable, vertical_spacing=0.1)
         for index, figure in enumerate(cant_figures):
             datos= datos_tabla[datos_tabla['idVariable']==figure]
-            fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=figure, mode="markers"),
+            fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=dic_variables[figure], mode="markers"),
                row=index+1, col=1)
             fig.add_trace( {
                 'type': 'scatter',
@@ -122,7 +122,7 @@ def update_monitor_ecotec(grupo,n):
                 'y': datos['Valor'],
                 'mode': 'none',
                 'fill': 'tozeroy',
-                'name': figure
+                'name': dic_variables[figure]
             },
             row=index+1, col=1)
             fig.update_yaxes(title_text=figure, range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1)
