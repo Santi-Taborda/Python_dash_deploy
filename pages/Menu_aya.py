@@ -53,7 +53,7 @@ cards = [
     dbc.Card(
         dbc.CardBody(
             [
-                html.Img(src="assets\prec_1.bmp", className="img-fluid"),
+                html.Img(src="/assets/prec_1.bmp", className="img-fluid"),
                 html.Div(style={'margin-bottom': '10px'}),
                 dcc.Link("Predicción climática", href="https://satma-dashboards.onrender.com/aya/satelital", className="stretched-link"),
             ]
@@ -64,7 +64,7 @@ cards = [
     dbc.Card(
         dbc.CardBody(
             [
-                html.Img(src="assets\Caudal_predict.png", className="img-fluid"),
+                html.Img(src="/assets/Caudal_predict.png", className="img-fluid"),
                 html.Div(style={'margin-bottom': '10px'}),
                 dcc.Link("Predicción caudal", href="https://satma-dashboards.onrender.com/aya/caudal_predict", className="stretched-link"),
             ]
