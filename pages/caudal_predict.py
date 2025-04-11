@@ -116,7 +116,7 @@ layout = dbc.Container(children=[
     dbc.Row(children=[
         dcc.Interval(
             id='interval_component',
-            interval=5 * 60 * 1000,  # in milliseconds
+            interval=30 * 60 * 1000,  # in milliseconds
             n_intervals=0),
         dbc.Col( id='dates',
             children=[

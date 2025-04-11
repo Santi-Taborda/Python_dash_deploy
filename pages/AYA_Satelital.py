@@ -62,12 +62,7 @@ layout= dbc.Container(children=[
 
                     dcc.Dropdown(id='variable_button_satelital',
                                     options=['Temperatura','Precipitación'],
-                                    value='Temperatura', multi=False, className='mb-3'),
-    
-                    dcc.Interval(
-                    id='interval-component',
-                    interval=30*60*1000, # in milliseconds
-                    n_intervals=0),
+                                    value='Temperatura', multi=False, className='mb-3')
 
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
@@ -91,10 +86,9 @@ layout= dbc.Container(children=[
 
 @callback(
     Output('baner_satelital', 'items'),
-    Input ('variable_button_satelital', 'value'),
-    Input('interval-component', 'n_intervals')
+    Input ('variable_button_satelital', 'value')
     )
 
-def update_monitor_otun(variable,n):
+def update_monitor_otun(variable):
     items_baner_satelital = obtener_datos(variable=variable)
     return items_baner_satelital
