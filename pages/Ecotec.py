@@ -11,6 +11,7 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
+
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -59,7 +60,7 @@ layout= dbc.Container(children=[
 
                     dcc.Dropdown(id='grupo_button_ecotec',
                                     options=['Grupo 1','Grupo 2','Grupo 3','Grupo 4'],
-                                    value='Grupo 1', multi=False, className='mb-3'),
+                                    value='Grupo 3', multi=False, className='mb-3'),
     
                     dcc.Interval(
                     id='interval-component',
@@ -114,8 +115,8 @@ def update_monitor_ecotec(grupo,n):
         fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=dict_variable, vertical_spacing=0.1)
         for index, figure in enumerate(cant_figures):
             datos= datos_tabla[datos_tabla['idVariable']==figure]
-            fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=dic_variables[figure], mode="markers"),
-               row=index+1, col=1)
+            #fig.add_trace(go.Scatter(x=datos['IdTiempoRegistro'], y=datos['Valor'], name=dic_variables[figure], mode="markers"),
+            #   row=index+1, col=1)
             fig.add_trace( {
                 'type': 'scatter',
                 'x': datos['IdTiempoRegistro'],
