@@ -39,7 +39,7 @@ def obtener_datos():
 datos_tabla=obtener_datos()
 
 
-register_page(__name__, name="Ecotecbnología", path='/ecotec' )
+register_page(__name__, name="Ecotecnología", path='/ecotec' )
 
 layout= dbc.Container(children=[
     html.Div(
