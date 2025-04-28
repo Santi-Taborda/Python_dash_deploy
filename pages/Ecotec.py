@@ -11,7 +11,6 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
     password=env['DB_PASSWORD'],
@@ -19,7 +18,6 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT'],
     name=env['DB_NAME']
     )
-
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
@@ -59,8 +57,8 @@ layout= dbc.Container(children=[
                     html.H6("Seleccione el grupo que desea visualizar:", className="card-text", style={'margin-top':'1em'}),
 
                     dcc.Dropdown(id='grupo_button_ecotec',
-                                    options=['Grupo 1','Grupo 2','Grupo 3','Grupo 4'],
-                                    value='Grupo 3', multi=False, className='mb-3'),
+                                    options=[1,2,3,4],
+                                    value='1', multi=False, className='mb-3'),
     
                     dcc.Interval(
                     id='interval-component',
@@ -86,14 +84,6 @@ layout= dbc.Container(children=[
 
 def update_monitor_ecotec(grupo,n):
     datos_tabla = obtener_datos()
-    if grupo == 'Grupo 1':
-        grupo = 1
-    elif grupo == 'Grupo 2':
-        grupo = 2
-    elif grupo == 'Grupo 3':
-        grupo = 3
-    elif grupo == 'Grupo 4':
-        grupo = 4
 
     datos_tabla=datos_tabla[datos_tabla['idGrupo']==grupo]
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"])
@@ -126,7 +116,7 @@ def update_monitor_ecotec(grupo,n):
                 'name': dic_variables[figure]
             },
             row=index+1, col=1)
-            fig.update_yaxes(title_text=figure, range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1)
+            fig.update_yaxes(title_text=dic_variables[figure], range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1)
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
