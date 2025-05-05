@@ -37,17 +37,19 @@ icon_green = dict(
 )
 
 # La colonia, Mundo Nuevo, Ukumarí, La curva, La católica, La Dulcera, El Lago
+
 def datos_iniciales():
     fecha_actual=datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
     fecha_40_dias_atras=fecha_actual - timedelta(days=40)
     engine1 = create_engine(env.get('DB_URL'), echo=True)
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
-    query1 = "SELECT IdEstacion, Estacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13) AND Latitud IS NOT NULL AND Longitud IS NOT NULL"
-    query2= "SELECT Estacion, Estado FROM estaciones"
+    query1 = "SELECT IdEstacion, Estacion, CodEstacion, Latitud, Longitud FROM dimestacion WHERE IdTipoEstacion IN(1,2,7,8,9,10,11,12,13) AND Latitud IS NOT NULL AND Longitud IS NOT NULL"
+    query2= "SELECT CodEstacion, Estado FROM estaciones"
     dimestacion = pd.read_sql(query1, engine1)
     dimestado = pd.read_sql(query2, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
-    datos_tabla = pd.merge(dimestacion, dimestado, on="Estacion")
+    datos_tabla = pd.merge(dimestacion, dimestado, on="CodEstacion")
+    #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
 
     return datos_tabla, fecha_actual, fecha_40_dias_atras
 
