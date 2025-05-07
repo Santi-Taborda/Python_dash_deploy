@@ -41,6 +41,7 @@ datos_tabla=obtener_datos()
 
 register_page(__name__, name="Ecotecnología", path='/ecotec' )
 
+
 layout= dbc.Container(children=[
     html.Div(
         children=[
@@ -65,6 +66,14 @@ layout= dbc.Container(children=[
                     interval=5*60*1000, # in milliseconds
                     n_intervals=0),
 
+                    html.Div([
+                    html.Button("Descarga como CSV", id="download_csv_button_ecotec", className="btn btn-primary", style={'margin-bottom': '10px'}),
+                    dcc.Download(id="download_csv_ecotec")]),
+
+                html.Div([
+                    html.Button("Descarga como xlsx", id="download_xlsx_button_ecotec", className="btn btn-primary"),
+                    dcc.Download(id="download_xlsx_ecotec")]),
+
                     ])], 
                     className="shadow p-3 mb-5 bg-white rounded"
             )], width=3
@@ -75,6 +84,37 @@ layout= dbc.Container(children=[
     ]),
     html.Hr(),
     ], fluid=True)
+
+@callback(
+    Output("download_csv_ecotec", "data"),
+    Input("download_csv_button_ecotec", "n_clicks"),
+    Input("grupo_button_ecotec", "value"),
+    prevent_initial_call=True,
+)
+
+def download_csv(n_clicks, grupo):
+    if n_clicks:
+        datos_tabla = obtener_datos()
+        datos_tabla=datos_tabla[datos_tabla['idGrupo']==grupo]
+        nombre="Datos_grupo"+str(grupo)+".csv"
+        return dcc.send_data_frame(datos_tabla.to_csv, nombre, sep=',', index=False)
+    else:
+         return None
+@callback(
+    Output("download_xlsx_ecotec", "data"),
+    Input("download_xlsx_button_ecotec", "n_clicks"),
+    Input("grupo_button_ecotec", "value"),
+    prevent_initial_call=True,
+)
+
+def download_xlsx(n_clicks, grupo):
+    if n_clicks:
+        datos_tabla = obtener_datos()
+        datos_tabla=datos_tabla[datos_tabla['idGrupo']==grupo]
+        nombre="Datos_grupo"+str(grupo)+".xlsx"
+        return dcc.send_data_frame(datos_tabla.to_excel, nombre, sheet_name="Hoja 1", index=False)
+    else:
+         return None
 
 @callback(
     Output('monitor_ecotec', 'figure'),
