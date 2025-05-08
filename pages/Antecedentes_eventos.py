@@ -211,7 +211,14 @@ def update_monitor(dias, latitud, longitud, dia_inicio):
 
     puntos=puntos[indices,0]
 
-    datos_tabla_filtrados=datos_tabla[datos_tabla["Latitud"].isin(puntos)]
+
+    datos_tabla_filtrados = pd.DataFrame(columns=datos_tabla.columns)
+    for i in range(len(puntos)):
+        punto=puntos[i]
+        for index, estacion in datos_tabla.iterrows():
+            if estacion['Latitud'] == punto:
+                datos_tabla_filtrados = pd.concat([datos_tabla_filtrados, estacion.to_frame().T], ignore_index=True)
+
 
     engine = create_engine(env.get('DB_URL'), echo=True)
     
