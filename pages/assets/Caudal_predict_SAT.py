@@ -157,7 +157,7 @@ layout = dbc.Container(children=[
             width=3),
         dbc.Col(
             children=[
-                dcc.Graph(id='monitor_oferta_caudal_predict_aya', figure=figura),
+                dcc.Graph(id='monitor_oferta_caudal_predict_SAT', figure=figura),
             ],
             style={'overflowY': 'scroll', 'height': '100%'},
             width=9)
@@ -168,7 +168,7 @@ layout = dbc.Container(children=[
 
 
 @callback(
-    [Output('monitor_oferta_caudal_predict_aya', 'figure'),
+    [Output('monitor_oferta_caudal_predict_SAT', 'figure'),
      Output('dates', 'children')],
     [Input('interval_component', 'n_intervals'),
      Input('tramo_button', 'value'),
