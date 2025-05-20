@@ -139,7 +139,7 @@ layout = dbc.Container(children=[
             style={'width': '50%', 'margin-left': '20px', 'margin-top': '10px'},
         ),
 
-        dbc.Col( id='dates',
+        dbc.Col( id='dates_SAT',
             children=[
                 html.H3("Valores extremos"),
                 html.Hr(),
@@ -169,7 +169,7 @@ layout = dbc.Container(children=[
 
 @callback(
     [Output('monitor_oferta_caudal_predict_SAT', 'figure'),
-     Output('dates', 'children')],
+     Output('dates_SAT', 'children')],
     [Input('interval_component', 'n_intervals'),
      Input('tramo_button', 'value'),
      Input('tramo_button', 'options')],
