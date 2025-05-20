@@ -9,7 +9,7 @@ import geoglows
 import pytz
 import zarr
 
-def caudal_predict(fecha_inicio, fecha_fin, id_tramo):
+def caudal_predict(fecha_inicio, fecha_fin, id_tramo, nombre_tramo):
     reach_id = id_tramo  # tramo bocatoma
 
     sf = geoglows.data.forecast(reach_id)
@@ -83,6 +83,7 @@ def caudal_predict(fecha_inicio, fecha_fin, id_tramo):
     fig.update_layout(
         yaxis_title="Caudal (%)",
         xaxis_title="Fecha",
+        title=f"Predicción de caudal para {nombre_tramo}",
         hovermode="x unified"  # Permite ver todos los valores al pasar el cursor
     )
 
@@ -99,9 +100,9 @@ colombia_tz = pytz.timezone("America/Bogota")
 # Convertir las fechas a la zona horaria de Colombia
 max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
 min_actualized = datetime.now(colombia_tz)
-figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized)
+figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized, '610_408_927', 'Río Risaralda desembocadura')
 
-register_page(__name__, name="Predicción de caudales Bocatoma Nuevo Libaré", path='/aya/caudal_predict')
+register_page(__name__, name="Predicción de caudales Bocatoma Nuevo Libaré", path='/SAT/caudal_predict')
 
 
 layout = dbc.Container(children=[
@@ -133,7 +134,7 @@ layout = dbc.Container(children=[
                 {'label': 'Río Consota', 'value': '610_300_693'},
                 {'label': 'Quebrada Dosquebradas', 'value': '610_252_290'},
             ],
-            value='Río Risaralda',
+            value='610_408_927',
             multi=False,
             style={'width': '50%', 'margin-left': '20px', 'margin-top': '10px'},
         ),
@@ -170,12 +171,15 @@ layout = dbc.Container(children=[
     [Output('monitor_oferta_caudal_predict_aya', 'figure'),
      Output('dates', 'children')],
     [Input('interval_component', 'n_intervals'),
-     Input('tramo_button', 'value')]
+     Input('tramo_button', 'value'),
+     Input('tramo_button', 'options')],
+
 )
-def update_graph(n, id_tramo):
+def update_graph(n, id_tramo,nombre_tramo):
+    options = [option['label'] for option in nombre_tramo if option['value'] == id_tramo]
     max_actualized = (datetime.now(colombia_tz) + timedelta(days=7))
     min_actualized = datetime.now(colombia_tz)
-    figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized, id_tramo)
+    figura, min_date, min_value, max_date, max_value = caudal_predict(min_actualized, max_actualized, id_tramo, options[0])
 
     dates_children = [
     html.H3("Valores extremos"),
