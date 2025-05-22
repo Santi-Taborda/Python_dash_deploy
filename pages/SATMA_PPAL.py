@@ -43,6 +43,7 @@ icon_ENT= dict(
     iconSize=[35, 35]
 )
 
+
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
     fecha_2_dias_atras=fecha_actual - timedelta(days=2)
@@ -55,16 +56,33 @@ def obtener_datos():
     query1 = "SELECT idEstacion, IdTiempoRegistro, IdVariable, Valor FROM factmonitoreo WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
     query2 = "SELECT IdEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12)"
     query3= "SELECT Estacion, Estado FROM estaciones"
+    query4= "SELECT IdEstacion, IdTiempoRegistro, IdVariable, Valor FROM pruebas_calidad_aire WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
 
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_2_dias_str, hora_actual_str))
     dimestacion = pd.read_sql(query2, engine)
     dimestado = pd.read_sql(query3, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
 
+    datos_tabla_calidad_aire = pd.read_sql(query4, engine,  params=(hace_2_dias_str, hora_actual_str))
+    datos_tabla_calidad_aire.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
+    datos_tabla_calidad_aire["IdTiempoRegistro"] = pd.to_datetime(datos_tabla_calidad_aire["IdTiempoRegistro"], utc=True)
+    datos_tabla_calidad_aire['Estacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "UTP Calidad", "Las Violetas Calidad")
+    datos_tabla_calidad_aire['IdTipoEstacion'] = 20
+    datos_tabla_calidad_aire['Latitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, 4.7922, 4.8190)
+    datos_tabla_calidad_aire['Longitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, -75.6899, -75.6595)
+    datos_tabla_calidad_aire['Ubicacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "Universidad Tecnológica de Pereira, UTP", "Las Violetas")
+    datos_tabla_calidad_aire['Estado'] = 1
+
+    estacion_utp = pd.DataFrame([{'IdEstacion': '1000', 'IdTipoEstacion': 20, 'Estacion': 'UTP Calidad', 'Latitud': 4.7922, 'Longitud': -75.6899, 'Ubicacion': 'Universidad Tecnológica de Pereira, UTP'}])
+    dimestacion = pd.concat([dimestacion, estacion_utp], ignore_index=True)
+    estacion_violetas = pd.DataFrame([{'IdEstacion': '1001', 'IdTipoEstacion': 20, 'Estacion': 'Las Violetas Calidad', 'Latitud': 4.8190, 'Longitud': -75.6595, 'Ubicacion': 'Las Violetas'}])
+    dimestacion = pd.concat([dimestacion, estacion_violetas], ignore_index=True)
+
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
     datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
     datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
+    datos_tabla_filtrados= pd.concat([datos_tabla_filtrados, datos_tabla_calidad_aire], ignore_index=True)
     datos_tabla_filtrados.sort_values(by="IdTiempoRegistro", inplace=True)
 
     return datos_tabla_filtrados, dimestacion
@@ -93,7 +111,7 @@ def update_markers(_,n):
     datos_tabla, estaciones = obtener_datos()
     markers = []
     for _, row in estaciones.iterrows():
-        if row['IdTipoEstacion']==1 or row['IdTipoEstacion']==11 or row['IdTipoEstacion']==12:
+        if row['IdTipoEstacion']==1 or row['IdTipoEstacion']==11 or row['IdTipoEstacion']==12  or row['IdTipoEstacion']==20:
             icon=icon_ECT            
         elif row['IdTipoEstacion']==2 or row['IdTipoEstacion']==9 or row['IdTipoEstacion']==10:
             icon=icon_EHT
@@ -254,6 +272,30 @@ def display_popup(*args):
     fig_caudal.update_yaxes(title_text="Caudal m^3/s", showgrid=True, gridcolor='LightGray',range=[datos_caudal['Valor'].min() * 0.9, datos_caudal['Valor'].max() * 1.1])
     fig_caudal.update_layout( width=425, height=225, plot_bgcolor="white", paper_bgcolor='Gainsboro', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False))
     
+    datos_pm25= datos[datos['IdVariable']== 15]
+    fig_pm25= go.Figure()
+    fig_pm25.add_trace({
+            'type': 'scatter',
+            'x': datos_pm25['IdTiempoRegistro'],
+            'y': datos_pm25['Valor'],
+            "mode": "lines",
+            "fill": "tozeroy"
+        })
+    fig_pm25.update_yaxes(title_text="PM2.5 (µg/m³)", showgrid=True, gridcolor='LightGray',range=[datos_pm25['Valor'].min() * 0.9, datos_pm25['Valor'].max() * 1.1])
+    fig_pm25.update_layout( width=425, height=225, plot_bgcolor="white", paper_bgcolor='Gainsboro', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False))
+
+    datos_pm10= datos[datos['IdVariable']== 16]
+    fig_pm10= go.Figure()
+    fig_pm10.add_trace({
+            'type': 'scatter',
+            'x': datos_pm10['IdTiempoRegistro'],
+            'y': datos_pm10['Valor'],
+            "mode": "lines",
+            "fill": "tozeroy"
+        })
+    fig_pm10.update_yaxes(title_text="PM10 (µg/m³)", showgrid=True, gridcolor='LightGray',range=[datos_pm10['Valor'].min() * 0.9, datos_pm10['Valor'].max() * 1.1])
+    fig_pm10.update_layout( width=425, height=225, plot_bgcolor="white", paper_bgcolor='Gainsboro', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False))
+
 
     if estacion['IdTipoEstacion'].iloc[0]==1:
         dbc_tabs=dbc.Tabs([
@@ -311,7 +353,17 @@ def display_popup(*args):
             dbc.Tab(dcc.Graph(figure=fig_presion), label="Presión barométrica"),
             dbc.Tab(dcc.Graph(figure=fig_vel), label="Velocidad del viento"),
             dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento")                  
-        ])                             
+        ])
+
+    elif estacion['IdTipoEstacion'].iloc[0]==20:
+        dbc_tabs=dbc.Tabs([
+        dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
+        dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
+        dbc.Tab(dcc.Graph(figure=fig_hr), label="Humedad Relativa"),
+        dbc.Tab(dcc.Graph(figure=fig_pm25), label="PM2.5"),
+        dbc.Tab(dcc.Graph(figure=fig_pm10), label="PM10"),
+    ])                      
+                      
 
 
     popup_content = []
