@@ -43,7 +43,7 @@ def obtener_datos(variable):
 items_baner_SAT_satelital = obtener_datos(variable='Precipitación')
 
 
-register_page(__name__, name="Satelital", path='/SAT/satelital' )
+register_page(__name__, name="SAT Satelital", path='/SAT/satelital' )
 
 layout= dbc.Container(children=[
     html.Div(
