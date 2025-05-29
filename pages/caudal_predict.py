@@ -118,7 +118,7 @@ layout = dbc.Container(children=[
             id='interval_component',
             interval=30 * 60 * 1000,  # in milliseconds
             n_intervals=0),
-        dbc.Col( id='dates',
+        dbc.Col( id='dates_aya_caudal_predict',
             children=[
                 html.H3("Valores extremos"),
                 html.Hr(),
@@ -148,7 +148,7 @@ layout = dbc.Container(children=[
 
 @callback(
     [Output('monitor_oferta_caudal_predict_aya', 'figure'),
-     Output('dates', 'children')],
+     Output('dates_aya_caudal_predict', 'children')],
     [Input('interval_component', 'n_intervals')]
 )
 def update_graph(n):

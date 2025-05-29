@@ -1,4 +1,4 @@
-""" from dash import Dash, html, dcc, callback, Output, Input, register_page
+from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
@@ -196,4 +196,3 @@ def update_graph(n, id_tramo,nombre_tramo):
     ]
 
     return figura, dates_children
- """
