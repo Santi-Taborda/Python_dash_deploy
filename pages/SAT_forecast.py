@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from os import environ as env
 
 
-env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
     password=env['DB_PASSWORD_2'],
     host=env['DB_HOST_2'],
@@ -21,11 +21,11 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
 def obtener_datos():
     
     # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL'), echo=True)
+    engine2 = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
     query1 = "SELECT IdRegistro, idPunto, Lugar, IdTiempoRegistro, Temperatura, Precipitacion FROM forecast"
 
-    datos_tabla = pd.read_sql(query1, engine)
+    datos_tabla = pd.read_sql(query1, engine2)
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"])
     datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
