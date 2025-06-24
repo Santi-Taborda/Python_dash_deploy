@@ -9,6 +9,14 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
+import requests
+import matplotlib.pyplot as plt
+import json
+import numpy as np
+from zoneinfo import ZoneInfo
+import openmeteo_requests
+import requests_cache
+from retry_requests import retry
 
 env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
@@ -17,15 +25,15 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT_2'],
     name=env['DB_NAME_SATMA']
     )
- 
+
 def obtener_datos():
     
     # Conexión a la base de datos MySQL
-    engine2 = create_engine(env.get('DB_URL_2'), echo=True)
+    engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT IdRegistro, idPunto, Lugar, IdTiempoRegistro, Temperatura, Precipitacion FROM forecast"
+    query1 = "SELECT IdRegistro, idPunto, Lugar, idPronostico, IdTiempoRegistro, Temperatura, Precipitacion FROM forecast"
 
-    datos_tabla = pd.read_sql(query1, engine2)
+    datos_tabla = pd.read_sql(query1, engine)
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"])
     datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
@@ -53,6 +61,7 @@ layout= dbc.Container(children=[
         dbc.Col(children=[dbc.Card(children=[
                     dbc.CardBody(children=[
                     html.H4("Controles", className="card-title"),
+
                     html.H6("Seleccione los puntos que desea visualizar:", className="card-text" ),
                     dcc.Dropdown(
                         id='lugar-dropdown_forecast_SAT',
@@ -67,6 +76,13 @@ layout= dbc.Container(children=[
                                     options=[{'label': 'Temperatura', 'value': 'Temperatura'},
                                               {'label': 'Precipitacion', 'value': 'Precipitacion'}],
                                     value='Temperatura', multi=False, className='mb-3'),
+
+                    html.H6("Seleccione el modelo predictivo:", className="card-text", style={'margin-top':'1em'}),
+
+                    dcc.RadioItems(id='modelo-button_forecast_SAT',
+                                    options=["Pronóstico 1", "Pronóstico 2"],
+                                    value='Pronóstico 1', className='mb-3'),
+
                     html.H6("Seleccione el rango de fechas que desea visualizar:", className="card-text" ),
 
                     dbc.Card(children=[
@@ -120,11 +136,12 @@ def update_slider(n):
     Output('Monitor_forecast_SAT', 'figure'),
     Input('datetime-range-slider_forecast_SAT', 'value'),
     Input('lugar-dropdown_forecast_SAT', 'value'),
+    Input('modelo-button_forecast_SAT', 'value'),
     Input ('variable-button_forecast_SAT', 'value'),
     Input('interval-component', 'n_intervals')
     )
 
-def update_monitor(date_time, lugares, variable,n):
+def update_monitor(date_time, lugares, modelo, variable,n):
     datos_tabla = obtener_datos()
 
     if isinstance(lugares, str):
@@ -137,6 +154,11 @@ def update_monitor(date_time, lugares, variable,n):
     elif variable == 'Precipitacion':
         datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados["Precipitacion"].notna()]
         datos_tabla_filtrados = datos_tabla_filtrados.rename(columns={"Precipitacion": "Valor"})
+    
+    if modelo == 'Pronóstico 1':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados['idPronostico'] == 'Tomorrow']
+    elif modelo == 'Pronóstico 2':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados['idPronostico'] == 'Open Meteo']
 
     start_time = pd.to_datetime(date_time[0], unit='s')
     end_time = pd.to_datetime(date_time[1], unit='s')
