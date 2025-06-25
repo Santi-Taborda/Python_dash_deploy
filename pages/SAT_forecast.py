@@ -22,7 +22,7 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
 def obtener_datos():
     
     # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL'), echo=True)
+    engine = create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
     query1 = "SELECT IdRegistro, idPunto, Lugar, idPronostico, IdTiempoRegistro, Temperatura, Precipitacion FROM forecast"
 
