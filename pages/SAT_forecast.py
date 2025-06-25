@@ -2,6 +2,7 @@ from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
+import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import pymysql
@@ -9,14 +10,6 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 from os import environ as env
 
-import requests
-import matplotlib.pyplot as plt
-import json
-import numpy as np
-from zoneinfo import ZoneInfo
-import openmeteo_requests
-import requests_cache
-from retry_requests import retry
 
 env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
