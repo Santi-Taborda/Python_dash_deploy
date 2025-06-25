@@ -12,3 +12,9 @@ geoglows==1.0.0-rc.5
 pytz
 zarr
 openpyxl
+requests
+json
+zoneinfo
+openmeteo_requests
+requests_cache
+retry_requests
