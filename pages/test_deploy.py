@@ -25,7 +25,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (3, 8, 9, 10, 14, 16, 21, 22, 23, 24, 25, 26, 79, 80, 122) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (3, 8, 9, 10, 14, 16, 21, 22, 23, 24, 25, 26, 79, 80, 122, 124) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
