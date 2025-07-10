@@ -74,18 +74,18 @@ def obtener_datos():
     datos_tabla_calidad_aire['Estado'] = 1
 
     estacion_utp = pd.DataFrame([{'IdEstacion': '1000', 'IdTipoEstacion': 20, 'Estacion': 'UTP Calidad', 'Latitud': 4.7922, 'Longitud': -75.6899, 'Ubicacion': 'Universidad Tecnológica de Pereira, UTP'}])
-    dimestacion = pd.concat([dimestacion, estacion_utp], ignore_index=True)
+    #dimestacion = pd.concat([dimestacion, estacion_utp], ignore_index=True)
     estacion_violetas = pd.DataFrame([{'IdEstacion': '1001', 'IdTipoEstacion': 20, 'Estacion': 'Las Violetas Calidad', 'Latitud': 4.8190, 'Longitud': -75.6595, 'Ubicacion': 'Las Violetas'}])
-    dimestacion = pd.concat([dimestacion, estacion_violetas], ignore_index=True)
+    #dimestacion = pd.concat([dimestacion, estacion_violetas], ignore_index=True)
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
-    datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
-    datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
-    datos_tabla_filtrados= pd.concat([datos_tabla_filtrados, datos_tabla_calidad_aire], ignore_index=True)
-    datos_tabla_filtrados.sort_values(by="IdTiempoRegistro", inplace=True)
+    #datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
+    #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
+    #datos_tabla_filtrados= pd.concat([datos_tabla_filtrados, datos_tabla_calidad_aire], ignore_index=True)
+    datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
 
-    return datos_tabla_filtrados, dimestacion
+    return datos_tabla, dimestacion
 
 datos_tabla, estaciones=obtener_datos()
 name=""
