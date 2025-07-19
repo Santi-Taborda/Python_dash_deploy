@@ -2,7 +2,6 @@ from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
 import dash_bootstrap_components as dbc
-import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import pymysql
@@ -18,13 +17,13 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT_2'],
     name=env['DB_NAME_SATMA']
     )
-
+ 
 def obtener_datos():
     
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
-    query1 = "SELECT IdRegistro, idPunto, Lugar, idPronostico, IdTiempoRegistro, Temperatura, Precipitacion FROM forecast"
+    query1 = "SELECT IdRegistro, idPunto, Lugar, idPronostico, IdTiempoRegistro, Temperatura, Precipitacion, ProbabilidadPrecipitacion FROM forecast"
 
     datos_tabla = pd.read_sql(query1, engine)
 
@@ -102,8 +101,15 @@ layout= dbc.Container(children=[
             )], width=3
         ),
         dbc.Col(
-            dcc.Graph(id='Monitor_forecast_SAT'),style={'overflowY': 'scroll', 'height': '100%'},
-                width=9)
+            children=[
+                dcc.Graph(id='Monitor_forecast_SAT', style={'overflowY': 'scroll', 'height': '80%', 'maxHeight': '900px'}),
+                html.H5("Próximas 12 horas:", style={'textAlign': 'center', 'color': '#0d6efd', 'margin-top':'10px'}, className='mb-3'),
+                html.H6(id='12_horas_forecast_SAT', style={'textAlign': 'center', 'color': "#0b0c0e", 'margin-top':'10px'}, className='mb-3')
+            ],
+            width=9
+        ),
+
+        
     ]),
     html.Hr(),
     ], fluid=True)
@@ -147,7 +153,7 @@ def update_monitor(date_time, lugares, modelo, variable,n):
     elif variable == 'Precipitacion':
         datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados["Precipitacion"].notna()]
         datos_tabla_filtrados = datos_tabla_filtrados.rename(columns={"Precipitacion": "Valor"})
-    
+
     if modelo == 'Pronóstico 1':
         datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados['idPronostico'] == 'Tomorrow']
     elif modelo == 'Pronóstico 2':
@@ -169,7 +175,7 @@ def update_monitor(date_time, lugares, modelo, variable,n):
             
         fig.update_layout(autosize=True, title_text="NINGUNO DE LOS LUGARES PREDICE LA VARIABLE ESTABLECIDA")
     else: 
-        fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=cant_figures, vertical_spacing=0.1)
+        fig= make_subplots(rows=len(cant_figures), cols=1, subplot_titles=cant_figures, vertical_spacing=0.15)
         for index, figure in enumerate(cant_figures):
             datos= datos_tabla_filtrados[datos_tabla_filtrados['Lugar']==figure]
             fig.add_trace( {
@@ -186,3 +192,66 @@ def update_monitor(date_time, lugares, modelo, variable,n):
         fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
  
+@callback(
+    Output('12_horas_forecast_SAT', 'children'),
+    Input('lugar-dropdown_forecast_SAT', 'value'),
+    Input('modelo-button_forecast_SAT', 'value'),
+    Input ('variable-button_forecast_SAT', 'value'),
+    Input('interval-component', 'n_intervals')
+    )
+
+def update_12_horas(lugares, modelo, variable, n):
+    datos_tabla = obtener_datos()
+
+    if isinstance(lugares, str):
+        lugares = [lugares]
+
+    datos_tabla_filtrados= datos_tabla[datos_tabla["Lugar"].isin(lugares)]
+
+    if variable == 'Temperatura':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados["Temperatura"].notna()]
+        datos_tabla_filtrados = datos_tabla_filtrados.rename(columns={"Temperatura": "Valor"})
+
+
+    elif variable == 'Precipitacion':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados["Precipitacion"].notna()]
+        datos_tabla_filtrados = datos_tabla_filtrados.rename(columns={"Precipitacion": "Valor"})
+    
+    if modelo == 'Pronóstico 1':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados['idPronostico'] == 'Tomorrow']
+    elif modelo == 'Pronóstico 2':
+        datos_tabla_filtrados = datos_tabla_filtrados[datos_tabla_filtrados['idPronostico'] == 'Open Meteo']
+
+    fecha_actual = datetime.now()
+    fecha_12_horas = fecha_actual + timedelta(hours=12)
+
+    pronostico_12_horas = datos_tabla_filtrados[
+        (datos_tabla_filtrados["IdTiempoRegistro"] >= fecha_actual) &
+        (datos_tabla_filtrados["IdTiempoRegistro"] <= fecha_12_horas)
+    ]
+
+    if pronostico_12_horas.empty:
+        return "No hay pronósticos disponibles para las próximas 12 horas."
+
+    pronostico_texto = []
+    for lugar in pd.unique(pronostico_12_horas["Lugar"]):
+        datos_lugar = pronostico_12_horas[pronostico_12_horas["Lugar"] == lugar]
+        if variable == 'Temperatura':
+            temperatura_media = datos_lugar['Valor'].mean()
+            temp_max = datos_lugar['Valor'].max()
+            temp_min = datos_lugar['Valor'].min()
+            pronostico_texto.append(f"Pronóstico de temperatura para {lugar}: temperatura media: {temperatura_media:.2f} °C (Máxima: {temp_max:.2f} °C, Mínima: {temp_min:.2f} °C)")
+        elif variable == 'Precipitacion':
+            precipitacion_total = datos_lugar['Valor'].sum()
+            probabilidad_precipitacion = pronostico_12_horas[pronostico_12_horas["Lugar"] == lugar]['ProbabilidadPrecipitacion'].mean()
+            if probabilidad_precipitacion > 50:   
+                pronostico_texto.append(f"{lugar}: Precipitación acumulada próximas 12 h: {precipitacion_total:.2f} mm (Probabilidad de precipitación: {probabilidad_precipitacion:.1f}%)")
+            else:
+                pronostico_texto.append(f"{lugar}: No se espera precipitación significativa en las próximas 12 horas (Probabilidad de precipitación: {probabilidad_precipitacion:.1f}%)")
+    children = []
+    if not pronostico_texto:
+        children.append(html.P("No hay pronósticos disponibles para las próximas 12 horas."))
+    else:
+        for linea in pronostico_texto:
+            children.append(html.P(linea))  # cada línea en su propio párrafo
+        return children
