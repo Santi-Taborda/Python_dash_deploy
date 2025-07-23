@@ -243,7 +243,7 @@ def update_12_horas(lugares, modelo, variable, n):
             pronostico_texto.append(f"Pronóstico de temperatura para {lugar}: temperatura media: {temperatura_media:.2f} °C (Máxima: {temp_max:.2f} °C, Mínima: {temp_min:.2f} °C)")
         elif variable == 'Precipitacion':
             precipitacion_total = datos_lugar['Valor'].sum()
-            probabilidad_precipitacion = pronostico_12_horas[pronostico_12_horas["Lugar"] == lugar]['ProbabilidadPrecipitacion'].mean()
+            probabilidad_precipitacion = pronostico_12_horas[pronostico_12_horas["Lugar"] == lugar]['ProbabilidadPrecipitacion'].max()
             if probabilidad_precipitacion > 50:   
                 pronostico_texto.append(f"{lugar}: Precipitación acumulada próximas 12 h: {precipitacion_total:.2f} mm (Probabilidad de precipitación: {probabilidad_precipitacion:.1f}%)")
             else:
