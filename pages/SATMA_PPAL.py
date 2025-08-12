@@ -12,6 +12,37 @@ from datetime import datetime, timedelta, date, time
 from os import environ as env
 from scipy.spatial import cKDTree
 import ftplib
+import base64
+import tempfile
+
+FTP_USER = env.get('FTP_USER')
+FTP_PASS = env.get('FTP_PASS')
+FTP_HOST = env.get('FTP_HOST')
+
+
+def get_foto_ftp(cod_estacion):
+    try:
+        ftp = ftplib.FTP(FTP_HOST)
+        ftp.login(FTP_USER, FTP_PASS)
+        ftp.cwd("/imagenes_satma_web")
+        filename = f"{cod_estacion}.jpg"
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            try:
+                ftp.retrbinary(f"RETR {filename}", tmp_file.write)
+            except Exception:
+                # Si no existe la foto, intenta con NO_FOTO.jpg
+                tmp_file.seek(0)
+                tmp_file.truncate()
+                ftp.retrbinary("RETR NO_FOTO.jpg", tmp_file.write)
+            tmp_file_path = tmp_file.name
+        ftp.quit()
+        with open(tmp_file_path, "rb") as f:
+            img_data = f.read()
+        img_b64 = base64.b64encode(img_data).decode()
+        return f"data:image/jpeg;base64,{img_b64}"
+    except Exception:
+        # Si falla todo, muestra un string vacío o una imagen local de emergencia
+        return ""
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
@@ -54,7 +85,7 @@ def obtener_datos():
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
     query1 = "SELECT idEstacion, IdTiempoRegistro, IdVariable, Valor FROM factmonitoreo WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
-    query2 = "SELECT IdEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12)"
+    query2 = "SELECT IdEstacion, CodEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12)"
     query3= "SELECT Estacion, Estado FROM estaciones"
     query4= "SELECT IdEstacion, IdTiempoRegistro, IdVariable, Valor FROM pruebas_calidad_aire WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
 
@@ -148,6 +179,8 @@ def display_popup(*args):
     lat=estacion["Latitud"].iloc[0]
     name=estacion["Estacion"].iloc[0]
     station_info=estacion["Ubicacion"].iloc[0]
+    cod_estacion = estacion["CodEstacion"].iloc[0]
+    foto_src = get_foto_ftp(cod_estacion)
     
     datos= datos_tabla[datos_tabla['Estacion']==estacion_seleccionada]
     datos_temp= datos[datos['IdVariable']== 1]
@@ -378,7 +411,7 @@ def display_popup(*args):
                                             html.Div([
                                                 html.H3(name, className="card-title", style={"text-align": "center"}),
                                                 html.P(station_info, className="card-text", style={"text-align": "center"}),
-                                                html.Img(src="/assets/bocatoma_nuevo_libare.jpeg", style={"width": "100%", "border-radius": "10px", "margin-top": "10px", "border": "3px solid #ddd"}),
+                                                html.Img(src=foto_src, style={"width": "100%", "border-radius": "10px", "margin-top": "10px", "border": "3px solid #ddd"}),
                                             ], style={"flex": "1", "padding": "10px"}),
                                             html.Div([
                                                 dbc_tabs
