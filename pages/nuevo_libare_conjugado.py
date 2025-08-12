@@ -70,6 +70,11 @@ def obtener_datos():
     datos_tabla_3 = pd.read_sql(query3, engine,  params=(hace_40_dias_str, hora_actual_str))
 
     #Concateno tablas
+
+    for df in [datos_tabla_1, datos_tabla_2, datos_tabla_3]:
+        df["IdTiempoRegistro"] = pd.to_datetime(df["IdTiempoRegistro"], errors="coerce", utc=True)
+
+
     datos_tabla = pd.merge(datos_tabla_1, datos_tabla_2, on="IdTiempoRegistro")
     datos_tabla = pd.merge(datos_tabla, datos_tabla_3, on="IdTiempoRegistro")
     #Redondeo a 5 minutos
