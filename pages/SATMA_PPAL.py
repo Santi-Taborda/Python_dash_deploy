@@ -61,19 +61,18 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
 
 icon_ECT= dict(
     iconUrl='/assets/ECT_icon.jpg',
-    iconSize=[35, 35]
+    iconSize=[60, 40]
 )
 
 icon_EHT= dict(
     iconUrl='/assets/EHT_icon.jpg',
-    iconSize=[35, 35]
+    iconSize=[60, 40]
 )
 
 icon_ENT= dict(
     iconUrl='/assets/ENT_icon.jpg',
-    iconSize=[35, 35]
+    iconSize=[50, 30]
 )
-
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
@@ -154,7 +153,7 @@ def update_markers(_,n):
             position=[row["Latitud"], row["Longitud"]],
             icon=icon, 
             id=row['Estacion'],
-            children=[dl.Tooltip(name),dl.Popup(id=f"popup-{row['Estacion']}", children="Cargando...", maxWidth=700, minWidth=700)])
+            children=[dl.Tooltip(name),dl.Popup(id=f"popup-{row['Estacion']}", children="Cargando...", maxWidth=700, minWidth=200)])
         
         markers.append(marker)
     
