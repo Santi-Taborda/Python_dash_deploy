@@ -60,17 +60,17 @@ env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     )
 
 icon_ECT= dict(
-    iconUrl='/assets/ECT.png',
+    iconUrl='/assets/ECT_icon.jpg',
     iconSize=[35, 35]
 )
 
 icon_EHT= dict(
-    iconUrl='/assets/EHT.png',
+    iconUrl='/assets/EHT_icon.jpg',
     iconSize=[35, 35]
 )
 
 icon_ENT= dict(
-    iconUrl='/assets/ENT.png',
+    iconUrl='/assets/ENT_icon.jpg',
     iconSize=[35, 35]
 )
 
