@@ -164,7 +164,7 @@ def update_markers(_,n):
     [Output(f"popup-{estacion}", "children") for estacion in estaciones["Estacion"]],
     [Input(estacion, "n_clicks") for estacion in estaciones["Estacion"]]
 )
-def display_popup(*args):
+def display_popup(_, *args):
     ctx = callback_context
     if not ctx.triggered:
         return None  # No se ha hecho clic en ningún marcador
