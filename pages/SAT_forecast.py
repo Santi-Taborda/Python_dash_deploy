@@ -26,6 +26,10 @@ def obtener_datos():
     query1 = "SELECT IdRegistro, idPunto, Lugar, idPronostico, IdTiempoRegistro, Temperatura, Precipitacion, ProbabilidadPrecipitacion FROM forecast"
 
     datos_tabla = pd.read_sql(query1, engine)
+    
+    datos_tabla["Temperatura"] = pd.to_numeric(datos_tabla["Temperatura"], errors='coerce')
+    datos_tabla["Precipitacion"] = pd.to_numeric(datos_tabla["Precipitacion"], errors='coerce')
+    datos_tabla["ProbabilidadPrecipitacion"] = pd.to_numeric(datos_tabla["ProbabilidadPrecipitacion"], errors='coerce')
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"])
     datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
