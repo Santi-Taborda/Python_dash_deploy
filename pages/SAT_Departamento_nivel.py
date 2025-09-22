@@ -11,6 +11,7 @@ import dash_leaflet as dl
 from datetime import datetime, timedelta, date, time
 from os import environ as env
 from scipy.spatial import cKDTree
+import pytz
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER'],
@@ -46,7 +47,8 @@ icon_green = dict(
 )
 
 def obtener_datos():
-    fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
+    tz = pytz.timezone("America/Bogota")
+    fecha_actual= datetime.now(tz)
     fecha_40_dias_atras=fecha_actual - timedelta(days=2)
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_40_dias_str = fecha_40_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
