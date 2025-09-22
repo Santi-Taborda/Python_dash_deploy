@@ -12,3 +12,4 @@ geoglows==1.0.0-rc.5
 pytz
 zarr
 openpyxl
+scipy
