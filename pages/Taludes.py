@@ -6,7 +6,7 @@ import pymysql
 import dash_leaflet as dl
 from os import environ as env
 
-env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
+env['DB_URL_MOMOS']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
     password=env['DB_PASSWORD_2'],
     host=env['DB_HOST_2'],
@@ -39,7 +39,7 @@ icon_black = dict(
 
 def tabla_nodo():
 # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL_2'), echo=True)
+    engine = create_engine(env.get('DB_URL_MOMOS'), echo=True)
     # Consultas SQL
     query1 = "SELECT idNodo, nameNodo, latitud, longitud FROM nodos"
     query2 = "SELECT idNodo, nameMomo, tableMomo, latitud, longitud FROM momos"
