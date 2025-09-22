@@ -204,7 +204,8 @@ def update_map(_, n):
                             icon=icon,
                             children=[
                             html.Audio(src='/assets/alert-102266.mp3', autoPlay=sound, # Ruta del archivo de audio en la carpeta assets
-                            controls=False),
+                            controls=False,
+                            key=f"{name}-{sound}-{n}"),
                             dl.Tooltip(name),
                             dl.Popup(
                                 children=[    
