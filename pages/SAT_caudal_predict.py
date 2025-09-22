@@ -56,8 +56,12 @@ def caudal_predict(fecha_inicio, fecha_fin, id_tramo, nombre_tramo):
     # Modificar los nombres de los ejes
     fig.update_layout(
         yaxis_title="Caudal (%)",
-        xaxis_title="Fecha",
-        hovermode="x unified"  # Permite ver todos los valores al pasar el cursor
+        xaxis_title="Fecha y hora",
+        title=f"Predicción de caudal para {nombre_tramo}",
+        hovermode="x unified",
+        xaxis=dict(
+            tickformat='%Y-%m-%d %H:%M'
+        )
     )
 
     # Crear un nuevo dataframe con los valores transformados
@@ -82,9 +86,12 @@ def caudal_predict(fecha_inicio, fecha_fin, id_tramo, nombre_tramo):
     # Modificar el nombre del eje X
     fig.update_layout(
         yaxis_title="Caudal (%)",
-        xaxis_title="Fecha",
+        xaxis_title="Fecha y hora",
         title=f"Predicción de caudal para {nombre_tramo}",
-        hovermode="x unified"  # Permite ver todos los valores al pasar el cursor
+        hovermode="x unified",
+        xaxis=dict(
+            tickformat='%Y-%m-%d %H:%M'
+        )
     )
 
     min_date = stats_modified['flow_avg'].idxmin()

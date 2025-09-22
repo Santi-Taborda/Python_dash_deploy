@@ -67,6 +67,7 @@ def obtener_datos():
     datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
     datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
     datos_tabla_filtrados.sort_values(by="IdTiempoRegistro", inplace=True)
+    dimestacion=dimestacion[dimestacion["Estacion"].isin(datos_tabla_filtrados["Estacion"].unique())]
 
     return datos_tabla_filtrados, dimestacion
 
