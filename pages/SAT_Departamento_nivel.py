@@ -10,7 +10,6 @@ from plotly.subplots import make_subplots
 import dash_leaflet as dl
 from datetime import datetime, timedelta, date, time
 from os import environ as env
-from scipy.spatial import cKDTree
 import pytz
 
 env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
