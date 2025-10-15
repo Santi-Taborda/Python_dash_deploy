@@ -84,7 +84,7 @@ def obtener_datos():
     engine2=create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
     query1 = "SELECT idEstacion, IdTiempoRegistro, IdVariable, Valor FROM factmonitoreo WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
-    query2 = "SELECT IdEstacion, CodEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12)"
+    query2 = "SELECT IdEstacion, CodEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12,14)"
     query3= "SELECT Estacion, Estado FROM estaciones"
     query4= "SELECT IdEstacion, IdTiempoRegistro, IdVariable, Valor FROM pruebas_calidad_aire WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
 
@@ -143,7 +143,7 @@ def update_markers(_,n):
     for _, row in estaciones.iterrows():
         if row['IdTipoEstacion']==1 or row['IdTipoEstacion']==11 or row['IdTipoEstacion']==12  or row['IdTipoEstacion']==20:
             icon=icon_ECT            
-        elif row['IdTipoEstacion']==2 or row['IdTipoEstacion']==9 or row['IdTipoEstacion']==10:
+        elif row['IdTipoEstacion']==2 or row['IdTipoEstacion']==9 or row['IdTipoEstacion']==10 or row['IdTipoEstacion']==14:
             icon=icon_EHT
         elif row['IdTipoEstacion']==3 or row['IdTipoEstacion']==7:
             icon=icon_ENT
@@ -335,6 +335,7 @@ def display_popup(_, *args):
             dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
             dbc.Tab(dcc.Graph(figure=fig_hr), label="Humedad Relativa"),
             dbc.Tab(dcc.Graph(figure=fig_rad), label="Radiación"),
+            dbc.Tab(dcc.Graph(figure=fig_presion), label="Presión barométrica"),
             dbc.Tab(dcc.Graph(figure=fig_vel), label="Velocidad del viento"),
             dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento"),
             dbc.Tab(dcc.Graph(figure=fig_eva), label="Evaporación")                     
@@ -386,6 +387,19 @@ def display_popup(_, *args):
             dbc.Tab(dcc.Graph(figure=fig_vel), label="Velocidad del viento"),
             dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento")                  
         ])
+
+    elif estacion['IdTipoEstacion'].iloc[0]==14:
+        dbc_tabs=dbc.Tabs([
+            dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
+            dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
+            dbc.Tab(dcc.Graph(figure=fig_hr), label="Humedad Relativa"),
+            dbc.Tab(dcc.Graph(figure=fig_rad), label="Radiación"),
+            dbc.Tab(dcc.Graph(figure=fig_presion), label="Presión barométrica"),
+            dbc.Tab(dcc.Graph(figure=fig_vel), label="Velocidad del viento"),
+            dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento"),
+            dbc.Tab(dcc.Graph(figure=fig_eva), label="Evaporación"),
+            dbc.Tab(dcc.Graph(figure=fig_nivel), label="Nivel"),
+    ])
 
     elif estacion['IdTipoEstacion'].iloc[0]==20:
         dbc_tabs=dbc.Tabs([
