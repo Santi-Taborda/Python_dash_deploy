@@ -289,7 +289,7 @@ def display_popup(_, *args):
             "mode": "lines",
             "fill": "tozeroy"
         })
-    fig_nivel.update_yaxes(title_text="Nivel (%)", showgrid=True, gridcolor='LightGray',range=[datos_nivel['Valor'].min() * 0.9, datos_nivel['Valor'].max() * 1.1])
+    fig_nivel.update_yaxes(title_text="Nivel (cm)", showgrid=True, gridcolor='LightGray',range=[datos_nivel['Valor'].min() * 0.9, datos_nivel['Valor'].max() * 1.1])
     fig_nivel.update_layout( width=425, height=225, plot_bgcolor="white", paper_bgcolor='Gainsboro', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False))
     
     datos_caudal= datos[datos['IdVariable']== 12]
