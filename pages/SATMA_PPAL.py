@@ -51,6 +51,7 @@ env['DB_URL']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     port=env['DB_PORT'],
     name=env['DB_NAME']
     )
+
 env['DB_URL_2']="mysql+pymysql://{user}:{password}@{host}:{port}/{name}".format(
     user=env['DB_USER_2'],
     password=env['DB_PASSWORD_2'],
@@ -73,6 +74,12 @@ icon_ENT= dict(
     iconUrl='/assets/ENT_icon.jpg',
     iconSize=[50, 30]
 )
+
+
+env['FTP_USER'] = 'your_ftp_username'
+env['FTP_PASSWORD'] = 'your_ftp_password'
+env['FTP_HOST'] = 'your_ftp_host'
+
 
 def obtener_datos():
     fecha_actual= datetime.now().replace(tzinfo=pd.Timestamp.now().tz)
@@ -97,14 +104,26 @@ def obtener_datos():
     dimestado = pd.read_sql(query3, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
 
-    estacion_utp = pd.DataFrame([{'IdEstacion': '1000', 'IdTipoEstacion': 20, 'Estacion': 'UTP Calidad', 'Latitud': 4.7922, 'Longitud': -75.6899, 'Ubicacion': 'Universidad Tecnológica de Pereira, UTP'}])
+    
+    #datos_tabla_calidad_aire.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
+    #datos_tabla_calidad_aire["IdTiempoRegistro"] = pd.to_datetime(datos_tabla_calidad_aire["IdTiempoRegistro"], utc=True)
+    #datos_tabla_calidad_aire['Estacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "UTP Calidad", "Las Violetas Calidad")
+    #datos_tabla_calidad_aire['IdTipoEstacion'] = 20
+    #datos_tabla_calidad_aire['Latitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, 4.7922, 4.8190)
+    #datos_tabla_calidad_aire['Longitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, -75.6899, -75.6595)
+    #datos_tabla_calidad_aire['Ubicacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "Universidad Tecnológica de Pereira, UTP", "Las Violetas")
+    #datos_tabla_calidad_aire['Estado'] = 1
 
+    estacion_utp = pd.DataFrame([{'IdEstacion': '1000', 'IdTipoEstacion': 20, 'Estacion': 'UTP Calidad', 'Latitud': 4.7922, 'Longitud': -75.6899, 'Ubicacion': 'Universidad Tecnológica de Pereira, UTP'}])
+    #dimestacion = pd.concat([dimestacion, estacion_utp], ignore_index=True)
     estacion_violetas = pd.DataFrame([{'IdEstacion': '1001', 'IdTipoEstacion': 20, 'Estacion': 'Las Violetas Calidad', 'Latitud': 4.8190, 'Longitud': -75.6595, 'Ubicacion': 'Las Violetas'}])
+    #dimestacion = pd.concat([dimestacion, estacion_violetas], ignore_index=True)
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
     #datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
     #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
+    #datos_tabla_filtrados= pd.concat([datos_tabla_filtrados, datos_tabla_calidad_aire], ignore_index=True)
     datos_tabla_filtrados= datos_tabla
     datos_tabla_filtrados.sort_values(by="IdTiempoRegistro", inplace=True)
 
@@ -115,8 +134,7 @@ datos_tabla, estaciones=obtener_datos()
 estaciones_nombres = estaciones["Estacion"].tolist()
 name=""
 
-
-register_page(__name__, name="SATMA_PPAL", path='/SATMA_PPAL')
+register_page(__name__, name="SATMA PPAL", path='/SATMA_PPAL')
 
 layout = dbc.Container([
     dcc.Store(id='datos_store', data=None),
