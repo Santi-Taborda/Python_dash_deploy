@@ -79,50 +79,47 @@ def obtener_datos():
     fecha_2_dias_atras=fecha_actual - timedelta(days=2)
     hora_actual_str = fecha_actual.strftime('%Y-%m-%d %H:%M:%S')
     hace_2_dias_str = fecha_2_dias_atras.strftime('%Y-%m-%d %H:%M:%S')
-    # Conexión a la base de datos MySQL
-    engine = create_engine(env.get('DB_URL'), echo=True)
-    engine2=create_engine(env.get('DB_URL_2'), echo=True)
     # Consultas SQL
     query1 = "SELECT idEstacion, IdTiempoRegistro, IdVariable, Valor FROM factmonitoreo WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
     query2 = "SELECT IdEstacion, CodEstacion, IdTipoEstacion, Estacion, Latitud, Longitud, Ubicacion FROM dimestacion WHERE IdTipoEstacion IN(1,2,3,7,9,10,11,12,14)"
-    query3= "SELECT Estacion, Estado FROM estaciones"
     query4= "SELECT IdEstacion, IdTiempoRegistro, IdVariable, Valor FROM pruebas_calidad_aire WHERE IdTiempoRegistro BETWEEN %s AND %s AND Valor IS NOT NULL"
+    query3= "SELECT Estacion, Estado FROM estaciones"
+    
 
-    datos_tabla = pd.read_sql(query1, engine,  params=(hace_2_dias_str, hora_actual_str))
+    # Consultas a upt_monestaciones
+    engine = create_engine(env.get('DB_URL'), echo=True)
+    datos_tabla = pd.read_sql(query1, engine, params=(hace_2_dias_str, hora_actual_str))
     dimestacion = pd.read_sql(query2, engine)
+    datos_tabla_calidad_aire = pd.read_sql(query4, engine, params=(hace_2_dias_str, hora_actual_str))
+
+    # Consulta a satma
+    engine2 = create_engine(env.get('DB_URL_2'), echo=True)
     dimestado = pd.read_sql(query3, engine2)
     dimestacion.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
 
-    datos_tabla_calidad_aire = pd.read_sql(query4, engine,  params=(hace_2_dias_str, hora_actual_str))
-    datos_tabla_calidad_aire.rename(columns={"IdEstacion": "idEstacion"}, inplace=True)
-    datos_tabla_calidad_aire["IdTiempoRegistro"] = pd.to_datetime(datos_tabla_calidad_aire["IdTiempoRegistro"], utc=True)
-    datos_tabla_calidad_aire['Estacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "UTP Calidad", "Las Violetas Calidad")
-    datos_tabla_calidad_aire['IdTipoEstacion'] = 20
-    datos_tabla_calidad_aire['Latitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, 4.7922, 4.8190)
-    datos_tabla_calidad_aire['Longitud'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, -75.6899, -75.6595)
-    datos_tabla_calidad_aire['Ubicacion'] = np.where(datos_tabla_calidad_aire['idEstacion'] == 1000, "Universidad Tecnológica de Pereira, UTP", "Las Violetas")
-    datos_tabla_calidad_aire['Estado'] = 1
-
     estacion_utp = pd.DataFrame([{'IdEstacion': '1000', 'IdTipoEstacion': 20, 'Estacion': 'UTP Calidad', 'Latitud': 4.7922, 'Longitud': -75.6899, 'Ubicacion': 'Universidad Tecnológica de Pereira, UTP'}])
-    #dimestacion = pd.concat([dimestacion, estacion_utp], ignore_index=True)
+
     estacion_violetas = pd.DataFrame([{'IdEstacion': '1001', 'IdTipoEstacion': 20, 'Estacion': 'Las Violetas Calidad', 'Latitud': 4.8190, 'Longitud': -75.6595, 'Ubicacion': 'Las Violetas'}])
-    #dimestacion = pd.concat([dimestacion, estacion_violetas], ignore_index=True)
 
     datos_tabla["IdTiempoRegistro"] = pd.to_datetime(datos_tabla["IdTiempoRegistro"], utc=True)
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
     #datos_tabla = pd.merge(datos_tabla, dimestado, on="Estacion")
     #datos_tabla_filtrados= datos_tabla[datos_tabla["Estado"] == 1]
-    #datos_tabla_filtrados= pd.concat([datos_tabla_filtrados, datos_tabla_calidad_aire], ignore_index=True)
-    datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
+    datos_tabla_filtrados= datos_tabla
+    datos_tabla_filtrados.sort_values(by="IdTiempoRegistro", inplace=True)
 
-    return datos_tabla, dimestacion
+
+    return datos_tabla_filtrados, dimestacion
 
 datos_tabla, estaciones=obtener_datos()
+estaciones_nombres = estaciones["Estacion"].tolist()
 name=""
+
 
 register_page(__name__, name="SATMA_PPAL", path='/SATMA_PPAL')
 
 layout = dbc.Container([
+    dcc.Store(id='datos_store', data=None),
     dcc.Store(id='selected_station', data=None),  # Estado del marcador seleccionado
     dl.Map(center=[5.0381, -75.5950], zoom=10, children=[
         dl.TileLayer(),
@@ -133,15 +130,30 @@ layout = dbc.Container([
 
 
 @callback(
+    Output('datos_store', 'data'),
+    Input('interval-component', 'n_intervals')
+)
+def actualizar_datos(n):
+    datos_tabla, estaciones = obtener_datos()
+    # Puedes guardar solo los datos que necesitas, por ejemplo:
+    return {
+        "datos_tabla": datos_tabla.to_dict('records'),
+        "estaciones": estaciones.to_dict('records')
+    }
+
+
+@callback(
     Output("layer_SATMA_p", "children"),
     [Input("layer_SATMA_p", "id"),
-    Input('interval-component', 'n_intervals')]
+    Input('datos_store', 'data')]
 )
-def update_markers(_,n):
-    datos_tabla, estaciones = obtener_datos()
+def update_markers(_,stored_data):
+    if stored_data is None:
+        return []
+    estaciones = pd.DataFrame(stored_data["estaciones"])
     markers = []
     for _, row in estaciones.iterrows():
-        if row['IdTipoEstacion']==1 or row['IdTipoEstacion']==11 or row['IdTipoEstacion']==12  or row['IdTipoEstacion']==20:
+        if row['IdTipoEstacion']==1 or row['IdTipoEstacion']==11 or row['IdTipoEstacion']==12 or row['IdTipoEstacion']==20:
             icon=icon_ECT            
         elif row['IdTipoEstacion']==2 or row['IdTipoEstacion']==9 or row['IdTipoEstacion']==10 or row['IdTipoEstacion']==14:
             icon=icon_EHT
@@ -161,18 +173,24 @@ def update_markers(_,n):
 
 
 @callback(
-    [Output(f"popup-{estacion}", "children") for estacion in estaciones["Estacion"]],
-    [Input(estacion, "n_clicks") for estacion in estaciones["Estacion"]]
+    [Output(f"popup-{estacion}", "children") for estacion in estaciones_nombres],
+    [Input(estacion, "n_clicks") for estacion in estaciones_nombres],
+    Input('datos_store', 'data')
 )
-def display_popup(_, *args):
+def display_popup(_,*args):
     ctx = callback_context
-    if not ctx.triggered:
-        return None  # No se ha hecho clic en ningún marcador
+    datos_store = args[-1]
 
     estacion_seleccionada = ctx.triggered[0]["prop_id"].split(".")[0].replace("marker-", "")
 
-    datos_tabla, estaciones=obtener_datos()
+    datos_tabla = pd.DataFrame(datos_store["datos_tabla"])
+    estaciones = pd.DataFrame(datos_store["estaciones"])
     estacion = estaciones[estaciones["Estacion"] == estacion_seleccionada]
+
+    if datos_store is None or not ctx.triggered:
+        return [["Cargando..."] for _ in range(len(estaciones))]
+
+
 
     lon=estacion["Longitud"].iloc[0]
     lat=estacion["Latitud"].iloc[0]
@@ -180,8 +198,9 @@ def display_popup(_, *args):
     station_info=estacion["Ubicacion"].iloc[0]
     cod_estacion = estacion["CodEstacion"].iloc[0]
     foto_src = get_foto_ftp(cod_estacion)
-    
+
     datos= datos_tabla[datos_tabla['Estacion']==estacion_seleccionada]
+
     datos_temp= datos[datos['IdVariable']== 1]
     fig_temp= go.Figure()
     fig_temp.add_trace({
@@ -289,7 +308,7 @@ def display_popup(_, *args):
             "mode": "lines",
             "fill": "tozeroy"
         })
-    fig_nivel.update_yaxes(title_text="Nivel (cm)", showgrid=True, gridcolor='LightGray',range=[datos_nivel['Valor'].min() * 0.9, datos_nivel['Valor'].max() * 1.1])
+    fig_nivel.update_yaxes(title_text="Nivel (%)", showgrid=True, gridcolor='LightGray',range=[datos_nivel['Valor'].min() * 0.9, datos_nivel['Valor'].max() * 1.1])
     fig_nivel.update_layout( width=425, height=225, plot_bgcolor="white", paper_bgcolor='Gainsboro', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False))
     
     datos_caudal= datos[datos['IdVariable']== 12]
@@ -386,7 +405,7 @@ def display_popup(_, *args):
             dbc.Tab(dcc.Graph(figure=fig_presion), label="Presión barométrica"),
             dbc.Tab(dcc.Graph(figure=fig_vel), label="Velocidad del viento"),
             dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento")                  
-        ])
+        ])  
 
     elif estacion['IdTipoEstacion'].iloc[0]==14:
         dbc_tabs=dbc.Tabs([
@@ -399,42 +418,40 @@ def display_popup(_, *args):
             dbc.Tab(dcc.Graph(figure=fig_dir), label="Dirección del viento"),
             dbc.Tab(dcc.Graph(figure=fig_eva), label="Evaporación"),
             dbc.Tab(dcc.Graph(figure=fig_nivel), label="Nivel"),
-    ])
+    ])     
 
     elif estacion['IdTipoEstacion'].iloc[0]==20:
         dbc_tabs=dbc.Tabs([
-        dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
-        dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
-        dbc.Tab(dcc.Graph(figure=fig_hr), label="Humedad Relativa"),
-        dbc.Tab(dcc.Graph(figure=fig_pm25), label="PM2.5"),
-        dbc.Tab(dcc.Graph(figure=fig_pm10), label="PM10"),
-    ])                      
-                      
+            dbc.Tab(dcc.Graph(figure=fig_temp), label="Temperatura"),
+            dbc.Tab(dcc.Graph(figure=fig_ppt), label="Precipitación"),
+            dbc.Tab(dcc.Graph(figure=fig_hr), label="Humedad Relativa"),
+            dbc.Tab(dcc.Graph(figure=fig_pm25), label="PM2.5"),
+            dbc.Tab(dcc.Graph(figure=fig_pm10), label="PM10"),
+        ])                      
 
 
-    popup_content = []
+    popup_content = [["Cargando..."] for _ in range(len(estaciones))]
 
-    for estacion in estaciones["Estacion"]:
-
-        if estacion==estacion_seleccionada:
-            children=[
-                                dbc.Card(
-                                    dbc.CardBody([
+    idx= estaciones.index[estaciones["Estacion"] == estacion_seleccionada].tolist()
+    if idx:
+        i=idx[0]
+        children=[
+                            dbc.Card(
+                                dbc.CardBody([
+                                    html.Div([
                                         html.Div([
-                                            html.Div([
-                                                html.H3(name, className="card-title", style={"text-align": "center"}),
-                                                html.P(station_info, className="card-text", style={"text-align": "center"}),
-                                                html.Img(src=foto_src, style={"width": "100%", "border-radius": "10px", "margin-top": "10px", "border": "3px solid #ddd"}),
-                                            ], style={"flex": "1", "padding": "10px"}),
-                                            html.Div([
-                                                dbc_tabs
-                                            ], style={"flex": "2", "padding": "10px"})
-                                        ], style={"display": "flex", "flex-direction": "row"})
-                                    ]),
-                                    style={"width": "700px", "margin": "auto", "box-shadow": "0 4px 8px 0 rgba(0, 0, 0, 0.2)", "border-radius": "10px"}
-                                )
-                            ]
-            popup_content.append(children)
-        else: 
-            popup_content.append(["Cargando..."])
+                                            html.H3(name, className="card-title", style={"text-align": "center"}),
+                                            html.P(station_info, className="card-text", style={"text-align": "center", "font-style": "bold"}),
+                                            html.Img(src=foto_src, style={"width": "100%", "border-radius": "10px", "margin-top": "10px", "border": "3px solid #ddd"}),
+                                            html.P("Coordenadas: "+str(lat)+","+str(lon), className="card-text", style={"text-align": "center", "color":"gray"}),
+                                        ], style={"flex": "1", "padding": "10px"}),
+                                        html.Div([
+                                            dbc_tabs
+                                        ], style={"flex": "2", "padding": "10px"})
+                                    ], style={"display": "flex", "flex-direction": "row"})
+                                ]),
+                                style={"width": "700px", "margin": "auto", "box-shadow": "0 4px 8px 0 rgba(0, 0, 0, 0.2)", "border-radius": "10px"}
+                            )
+                        ]
+        popup_content[i]=children
     return popup_content
