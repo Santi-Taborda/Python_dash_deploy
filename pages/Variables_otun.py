@@ -180,7 +180,10 @@ def update_monitor_otun(date_time, variable,n):
                 },
                 row=index+1, col=1)
 
-            fig.update_yaxes(title_text=figure, range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1, showgrid=False)
+            if datos.empty:
+                fig.update_yaxes(title_text=figure, row=index+1, col=1, showgrid=False)
+            else:
+                fig.update_yaxes(title_text=figure, range=[min(datos['Valor']), max(datos['Valor'])], row=index+1, col=1, showgrid=False)
             fig.update_xaxes(showticklabels=True, showgrid=False)
         if variable!="Precipitación":
             fig.update_layout(title_text=titulo, showlegend=False, height=len(cant_figures)*200, margin=dict(l=40, r=30, t=50, b=50), autosize=True, paper_bgcolor="LightSteelBlue", xaxis_title=None)
