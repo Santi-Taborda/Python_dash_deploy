@@ -25,7 +25,7 @@ def obtener_datos():
 # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (3, 8, 9, 10, 14, 16, 21, 22, 23, 24, 25, 26, 79, 80, 122, 124) AND IdTiempoRegistro BETWEEN %s AND %s"
+    query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (80, 122, 9, 8, 21, 22, 10, 15, 23, 79, 16, 24, 26, 14, 3, 82) AND IdTiempoRegistro BETWEEN %s AND %s"
     query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
@@ -38,7 +38,7 @@ def obtener_datos():
     datos_tabla = pd.merge(datos_tabla, dimestacion, on="idEstacion")
     datos_tabla = pd.merge(datos_tabla, dimvariable, on="idVariable")
     datos_tabla["timestamp"] = datos_tabla['IdTiempoRegistro'].apply(lambda x: x.timestamp())
-    datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
+    #datos_tabla.sort_values(by="IdTiempoRegistro", inplace=True)
     # Corregir valores de la variable 9 a 8
     datos_tabla.loc[datos_tabla["idVariable"] == 9, "idVariable"] = 8
     datos_tabla.loc[datos_tabla["idVariable"] == 9, "Variable"] = "Nivel del Cauce"
