@@ -26,7 +26,7 @@ def obtener_datos():
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
     query1 = "SELECT idEstacion, idVariable, IdTiempoRegistro, Valor FROM factmonitoreo WHERE idEstacion IN (80, 122, 9, 8, 21, 22, 10, 15, 23, 79, 16, 24, 26, 14, 3, 82) AND IdTiempoRegistro BETWEEN %s AND %s"
-    query2 = "SELECT IdEstacion, Estacion FROM dimestacion"
+    query2 = "SELECT IdEstacion, Estacion FROM dimestacion WHERE idEstacion IN (80, 122, 9, 8, 21, 22, 10, 15, 23, 79, 16, 24, 26, 14, 3, 82)"
     query3 = "SELECT idVariable, Variable FROM dimvariable"
 
     datos_tabla = pd.read_sql(query1, engine,  params=(hace_40_dias_str, hora_actual_str))
@@ -82,7 +82,7 @@ layout= dbc.Container(children=[
                     html.H6("Seleccione las estaciones que desea visualizar:", className="card-text" ),
                     dcc.Dropdown(
                         id='station-dropdown',
-                        options=pd.unique(datos_tabla["Estacion"]),
+                        options=["Santa Isabel", "Mesones", "La Argentina", "El Bosque", "Río Otún - Jordán", "Río Azul", "El Cedral Clima", "El Cedral Hidro", "Rio Barbo", "Cataluña", "San Juan", "Quebrada Volcanes", "Bocatoma Nuevo Libaré", "Planta de tratamiento", "San José", "Puerto Caldas"],
                         value='Planta de tratamiento',
                         multi=True,
                         className='mb-3'),
