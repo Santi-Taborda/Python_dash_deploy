@@ -21,7 +21,7 @@ def obtener_datos():
     # Conexión a la base de datos MySQL
     engine = create_engine(env.get('DB_URL'), echo=True)
     # Consultas SQL
-    query1 = "SELECT * FROM cc_visor"
+    query1 = "SELECT * FROM ccvisor"
     query2 = "SELECT idMunicipio, Municipio FROM ccmunicipios"
     query3 = "SELECT idVariable, Variable FROM ccvariables"
     query4 = "SELECT idEscenario, Escenario, idVariable FROM ccescenarios"
