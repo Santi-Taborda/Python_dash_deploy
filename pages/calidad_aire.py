@@ -1,3 +1,4 @@
+"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
@@ -61,3 +62,4 @@ def layout(api_key=None, id=None, temp=None, hum=None, PM10=None, PM25=None, PM1
         ]),
         Enviar_datos(api_key, id, temp, hum, PM10, PM25, PM100)
     )
+"""
