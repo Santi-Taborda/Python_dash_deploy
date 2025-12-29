@@ -1,3 +1,4 @@
+"""
 from dash import Dash, html, dcc, callback, Output, Input, register_page
 import plotly.express as px
 import plotly.graph_objs as go
@@ -160,3 +161,4 @@ def update_monitor_ecotec(grupo,n):
 
         fig.update_layout(autosize=True, height=len(cant_figures)*300, paper_bgcolor="LightSteelBlue", margin=dict(l=30, r=30, t=30, b=30))
     return fig
+"""
