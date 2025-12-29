@@ -27,10 +27,10 @@ def Enviar_datos(api_key, id, temp, hum, PM10, PM25, PM100):
     if api_key == '4LHTVAJZ2U7FKN3V':
         engine = create_engine(env.get('DB_URL'), echo=True)
         with engine.connect() as connection:
-            insert_query = text("""
+            insert_query = text(
                 INSERT INTO satma.calidad_aire_1 (IdTiempoRegistro, temperatura, humedad, pm10, pm25, pm100)
                 VALUES (:IdTiempoRegistro, :temperatura, :humedad, :pm10, :pm25, :pm100)
-            """)
+            )
             connection.execute(insert_query, {
                 'IdTiempoRegistro': hora_actual_str,
                 'temperatura': temp,
